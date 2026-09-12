@@ -138,7 +138,7 @@ function renderGrid() {
 
     cell.innerHTML = foundName
       ? `<span class="cell__check">✓</span><span class="cell__found">${escapeHtml(foundName)}</span>`
-      : `<span class="cell__dot"></span><span class="cell__text">${escapeHtml(question.text)}</span>`;
+      : `<span class="cell__dot"></span><span class="cell__text">${escapeHtml(question.shortLabel)}</span>`;
 
     grid.appendChild(cell);
   });

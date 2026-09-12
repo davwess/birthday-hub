@@ -40,6 +40,9 @@ birthday-hub/
 - **Vor der Party:** `js/questions.js` mit den finalen Fragen aus dem gemeinsamen
   Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
   verbindung zum Sheet mehr.
+- Jede Frage hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
+  einen `text` (volle Frage, erscheint erst beim Antippen). Der finale Fragenpool
+  aus dem Sheet sollte beides enthalten.
 
 ## Live-URL
 
