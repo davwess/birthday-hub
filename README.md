@@ -30,6 +30,22 @@ birthday-hub/
 - Phase 6b: Songwunsch → Google Sheet Anbindung – offen
 - Phase 7+: Zentrale Bingo-Synchronisierung, Fotos-Link – offen
 
+## Startseiten-Foto
+
+- `assets/hero.jpg` ist ein eigenes Foto von Bennet & David, oben auf der
+  Startseite als flache Foto-Kachel (`.hero-photo`, Seitenverhältnis 12:5).
+  Titel und Datum liegen als Text direkt auf dem Foto (`.hero-photo__content`),
+  unten mit dunklem Verlauf (`.hero-photo::after`) für Lesbarkeit – ähnlich wie
+  bei einer Reiseführer-Kopfzeile. Spart Höhe gegenüber Foto + Titel getrennt
+  untereinander.
+- Das Originalfoto liegt außerhalb des Repos unter
+  `30. Geburtstag/WhatsApp Bild David & Bennet.JPG` und wurde eng auf Gesichter/
+  Hände zugeschnitten und auf 1000×417 px verkleinert (~90 KB) nach
+  `assets/hero.jpg` exportiert. Soll das Foto mal ausgetauscht werden: neues
+  Foto auf ca. 1000 px Breite im Seitenverhältnis 12:5 zuschneiden (Motiv oben,
+  unteres Drittel eher ruhig/einfarbig lassen wegen des Textes), als
+  `assets/hero.jpg` speichern und die `?v=`-Nummer hochzählen (siehe unten).
+
 ## Bingo – wie es funktioniert
 
 - **Struktur:** 6 Kategorien × 3 Aufgaben = 18 Aufgaben insgesamt (`CATEGORY_ORDER`,

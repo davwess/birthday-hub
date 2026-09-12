@@ -53,19 +53,17 @@ a {
 }
 
 .hero {
-  text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   width: 100%;
   max-width: 420px;
 }
 
 .hero-photo {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 12 / 5;
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--card-border);
-  margin-bottom: 24px;
 }
 
 .hero-photo img {
@@ -79,28 +77,33 @@ a {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 10, 13, 0) 55%, rgba(10, 10, 13, 0.45) 100%);
+  background: linear-gradient(180deg, rgba(10, 10, 13, 0) 30%, rgba(10, 10, 13, 0.88) 100%);
+  z-index: 1;
   pointer-events: none;
 }
 
-.hero h1 {
-  font-size: clamp(2rem, 8vw, 2.6rem);
+.hero-photo__content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 14px 18px 16px;
+  text-align: left;
+}
+
+.hero-photo__content h1 {
+  font-size: clamp(1.4rem, 6.5vw, 1.9rem);
   font-weight: 700;
   letter-spacing: -0.01em;
-  margin: 0 0 10px;
+  margin: 0 0 3px;
+  color: var(--text);
 }
 
-.hero .tagline {
-  font-size: clamp(1.1rem, 5vw, 1.4rem);
-  color: var(--accent);
-  margin: 0 0 14px;
-}
-
-.hero .meta {
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.hero-photo__meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: rgba(245, 243, 239, 0.85);
   margin: 0;
 }
 
