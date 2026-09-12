@@ -306,14 +306,26 @@ function checkBingo() {
   if (ACTIVE_WIN_RULE(state.progress, state.cells)) {
     state.bingoAt = new Date().toISOString();
     saveState(state);
-    showBingoToast();
+    celebrateBingoFirstTime();
   }
 }
 
-function showBingoToast() {
-  const toast = document.getElementById("bingo-toast");
-  toast.classList.add("toast--visible");
-  setTimeout(() => toast.classList.remove("toast--visible"), 3500);
+// Zeigt einmalig eine große "BINGO!"-Einblendung in der Bildschirmmitte,
+// blendet sie nach kurzer Zeit wieder aus und lässt danach dauerhaft das
+// kleine Badge unten stehen.
+function celebrateBingoFirstTime() {
+  const celebration = document.getElementById("bingo-celebration");
+  celebration.classList.add("bingo-celebration--visible");
+  setTimeout(() => {
+    celebration.classList.remove("bingo-celebration--visible");
+    showBingoBadge();
+  }, 2200);
+}
+
+// Kleines Badge unten, bleibt sichtbar (auch nach Reload, solange
+// state.bingoAt gesetzt ist) - keine automatische Ausblendung.
+function showBingoBadge() {
+  document.getElementById("bingo-badge").classList.add("bingo-badge--visible");
 }
 
 // ---------- Start ----------
@@ -326,6 +338,9 @@ function init() {
   } else {
     renderTopbar();
     renderGrid();
+    // Wurde in einer früheren Sitzung schon "Bingo" erreicht: die große
+    // Feier nicht erneut zeigen, aber das Badge direkt sichtbar lassen.
+    if (state.bingoAt) showBingoBadge();
   }
 
   document.getElementById("name-form").addEventListener("submit", (e) => {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Bingo – Bennet & David 30</title>
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
   <div class="bingo-page">
@@ -44,9 +44,16 @@
     </div>
   </div>
 
-  <div class="toast" id="bingo-toast">🎉 Bingo!</div>
+  <!-- Große, einmalige Feier in der Bildschirmmitte beim Erreichen von Bingo -->
+  <div class="bingo-celebration" id="bingo-celebration">
+    <span class="bingo-celebration__emoji">🎉</span>
+    <span class="bingo-celebration__text">BINGO!</span>
+  </div>
 
-  <script src="js/questions.js?v=8"></script>
-  <script src="js/bingo.js?v=8"></script>
+  <!-- Bleibt danach dauerhaft unten sichtbar (auch nach Reload) -->
+  <div class="bingo-badge" id="bingo-badge">🎉 Bingo erreicht</div>
+
+  <script src="js/questions.js?v=9"></script>
+  <script src="js/bingo.js?v=9"></script>
 </body>
 </html>

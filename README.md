@@ -64,6 +64,10 @@ birthday-hub/
   Alternative Regeln (`categoryThreshold`, `complete`) sind weiterhin in
   `WIN_RULES` vorhanden und lassen sich per Zuweisung an `ACTIVE_WIN_RULE`
   jederzeit reaktivieren.
+- **Bingo-Feier:** Beim Erreichen erscheint einmalig groß "🎉 BINGO!" in der
+  Bildschirmmitte (ca. 2,2 Sek.), danach bleibt dauerhaft ein kleines Badge
+  unten sichtbar ("🎉 Bingo erreicht") – auch nach einem Reload, solange
+  `state.bingoAt` gesetzt ist. Die große Einblendung erscheint nur einmal.
 - **Vor der Party:** `js/questions.js` mit den finalen Aufgaben aus dem gemeinsamen
   Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
   verbindung zum Sheet mehr.

@@ -390,25 +390,72 @@ a {
   color: var(--text-muted);
 }
 
-/* ---------- Toast ---------- */
+/* ---------- Bingo-Feier: groß in der Mitte, einmalig ---------- */
 
-.toast {
+.bingo-celebration {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(10, 10, 13, 0.78);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 40;
+}
+
+.bingo-celebration--visible {
+  opacity: 1;
+}
+
+.bingo-celebration__emoji {
+  font-size: 4rem;
+  animation: bingo-pop 0.4s ease;
+}
+
+.bingo-celebration__text {
+  font-size: clamp(2rem, 11vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  animation: bingo-pop 0.4s ease;
+}
+
+@keyframes bingo-pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Bingo-Badge: bleibt danach dauerhaft unten sichtbar ---------- */
+
+.bingo-badge {
   position: fixed;
   left: 50%;
-  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   transform: translate(-50%, 12px);
   background: var(--accent);
   color: #14110a;
-  padding: 12px 22px;
+  padding: 10px 20px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.88rem;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 30;
 }
 
-.toast--visible {
+.bingo-badge--visible {
   opacity: 1;
   transform: translate(-50%, 0);
 }
