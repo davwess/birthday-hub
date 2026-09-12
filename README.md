@@ -6,7 +6,7 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 
 ```
 birthday-hub/
-├── index.html        # Startseite mit 3 Kacheln + einmaligem Namens-Prompt
+├── index.html        # Startseite mit Foto-Kachel, 3 Kacheln + einmaligem Namens-Prompt
 ├── bingo.html         # Bingo (Path Bingo, fertig)
 ├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
 ├── song.html          # Songwunsch-Formular (Frontend + Sheet-Anbindung fertig)
