@@ -32,11 +32,12 @@ birthday-hub/
 
 ## Startseiten-Foto
 
-- `assets/hero.jpg` ist ein eigenes Foto von Bennet & David. Titel, Tagline und
-  Datum stehen ganz oben (`.hero h1`, `.tagline`, `.meta`), direkt gefolgt von
-  den drei Karten – so kommt man ohne Scrollen an einem Foto vorbei direkt zu
-  Bingo/Fotos/Song. Die Foto-Kachel (`.hero-photo`, Seitenverhältnis 12:5,
-  dezenter Verlauf unten) steht als Abschluss nach "Wir freuen uns auf euch!".
+- `assets/hero.jpg` ist ein eigenes Foto von Bennet & David, oben auf der
+  Startseite als flache Foto-Kachel (`.hero-photo`, Seitenverhältnis 12:5,
+  dezenter Verlauf unten), gefolgt von Titel, Tagline und Datum (`.hero h1`,
+  `.tagline`, `.meta`) und den drei Karten.
+- "Wir freuen uns auf euch!" (`.footer-note`) ist etwas größer als
+  Standard-Fließtext (1rem statt der ursprünglichen 0.78rem).
 - Das Originalfoto liegt außerhalb des Repos unter
   `30. Geburtstag/WhatsApp Bild David & Bennet.JPG` und wurde eng auf Gesichter/
   Hände zugeschnitten und auf 1000×417 px verkleinert (~90 KB) nach
