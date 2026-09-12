@@ -20,6 +20,7 @@ html, body {
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 50% 0%, var(--bg-glow), transparent 55%),
     var(--bg);
@@ -183,6 +184,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 14px;
 }
 
@@ -190,6 +192,7 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   font-size: 0.85rem;
   color: var(--text-muted);
 }
@@ -197,6 +200,10 @@ a {
 #player-name {
   color: var(--text);
   font-weight: 600;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bingo-topbar__progress {
@@ -216,6 +223,8 @@ a {
 
 .cell {
   aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -245,12 +254,15 @@ a {
 }
 
 .cell__text {
-  font-size: clamp(0.72rem, 3.1vw, 0.82rem);
+  font-size: clamp(0.8rem, 3.6vw, 0.95rem);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.18;
   color: var(--text);
   text-align: center;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -267,11 +279,13 @@ a {
 }
 
 .cell__found {
-  font-size: clamp(0.72rem, 3.1vw, 0.82rem);
+  font-size: clamp(0.78rem, 3.4vw, 0.9rem);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.18;
   text-align: center;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;

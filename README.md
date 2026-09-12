@@ -34,9 +34,12 @@ birthday-hub/
   zweimal auf derselben Karte verwendet werden.
 - Alles wird in `localStorage` gespeichert – ein Neuladen oder Schließen der Seite
   löscht den Fortschritt nicht.
-- Die Gewinnregel ist bewusst austauschbar: in `js/bingo.js` steht `ACTIVE_WIN_RULE`
-  (aktuell „eine Reihe reicht“). Für „zwei Reihen“ oder „Full House“ genügt es, dort
-  eine andere Regel aus `WIN_RULES` zuzuweisen.
+- Die Gewinnregel ist bewusst austauschbar: in `js/bingo.js` steht `ACTIVE_WIN_RULE`.
+  Aktuell aktiv: **„pro Kategorie mindestens `CATEGORY_WIN_THRESHOLD` Treffer“**
+  (Standard: 3 von 5, unabhängig von der Position auf der Karte). Die Zahl einfach
+  in `js/bingo.js` ändern (z. B. auf 2). Die alten reihenbasierten Regeln
+  (`oneLine`, `twoLines`, `fullHouse`) sind weiterhin vorhanden und lassen sich per
+  Zuweisung an `ACTIVE_WIN_RULE` jederzeit reaktivieren.
 - **Vor der Party:** `js/questions.js` mit den finalen Fragen aus dem gemeinsamen
   Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
   verbindung zum Sheet mehr.

@@ -99,15 +99,42 @@ function countCompletedLines(progress) {
   return LINES.filter((line) => line.every((index) => filled[index])).length;
 }
 
+// Zählt, wie viele Treffer pro Kategorie schon eingetragen sind.
+// Braucht zusätzlich zu progress auch cells, weil dort steht, welche
+// Kategorie zu welchem Feld gehört.
+function countPerCategory(progress, cells) {
+  const counts = {};
+  progress.forEach((entry, index) => {
+    if (entry !== null) {
+      const category = cells[index].category;
+      counts[category] = (counts[category] || 0) + 1;
+    }
+  });
+  return counts;
+}
+
+// Mindestanzahl Treffer, die JEDE Kategorie erreichen muss, damit die
+// categoryThreshold-Regel unten "Bingo" auslöst.
+const CATEGORY_WIN_THRESHOLD = 3;
+
 const WIN_RULES = {
   oneLine: (progress) => countCompletedLines(progress) >= 1,
   twoLines: (progress) => countCompletedLines(progress) >= 2,
   fullHouse: (progress) => progress.every((entry) => entry !== null),
+  // Neu: keine Reihen/Spalten mehr nötig - stattdessen muss jede Kategorie
+  // mindestens CATEGORY_WIN_THRESHOLD Treffer haben.
+  categoryThreshold: (progress, cells) => {
+    const counts = countPerCategory(progress, cells);
+    return Object.keys(CATEGORY_QUOTAS).every(
+      (category) => (counts[category] || 0) >= CATEGORY_WIN_THRESHOLD
+    );
+  },
 };
 
-// Aktive Regel für Phase 4: eine volle Reihe/Spalte/Diagonale reicht.
-// Zum Ändern einfach eine andere Regel aus WIN_RULES zuweisen.
-const ACTIVE_WIN_RULE = WIN_RULES.oneLine;
+// Aktive Regel: pro Kategorie mind. CATEGORY_WIN_THRESHOLD Treffer, egal wo
+// auf der Karte. Zum Ändern (z. B. zurück auf "eine Reihe reicht") einfach
+// eine andere Regel aus WIN_RULES zuweisen.
+const ACTIVE_WIN_RULE = WIN_RULES.categoryThreshold;
 
 // ---------- Kategorie-Farben (nur Optik) ----------
 
@@ -230,7 +257,7 @@ function handleCellDelete() {
 
 function checkBingo() {
   if (state.bingoAt) return; // schon erreicht, nicht erneut feiern
-  if (ACTIVE_WIN_RULE(state.progress)) {
+  if (ACTIVE_WIN_RULE(state.progress, state.cells)) {
     state.bingoAt = new Date().toISOString();
     saveState(state);
     showBingoToast();
