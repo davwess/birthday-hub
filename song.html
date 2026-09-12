@@ -4,16 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Songwunsch – Bennet & David 30</title>
-  <link rel="stylesheet" href="css/style.css?v=9">
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
   <div class="subpage">
     <a class="back-link" href="index.html">‹ Zurück</a>
-    <div class="subpage-content">
-      <span class="icon">🎵</span>
-      <h2>Songwunsch-Formular folgt</h2>
-      <p>Hier könnt ihr bald direkt euren Song für die Tanzfläche eintragen.</p>
+
+    <div class="song-page" id="song-page">
+      <div class="song-intro">
+        <span class="icon">🎵</span>
+        <h2>Song wünschen</h2>
+        <p>Sag uns, was auf die Tanzfläche soll.</p>
+      </div>
+
+      <form class="song-form" id="song-form">
+        <label class="field-label" for="song-title">Songname *</label>
+        <input class="overlay__input" id="song-title" name="songTitle" type="text" placeholder="z. B. Dancing Queen" required autocomplete="off">
+
+        <label class="field-label" for="song-artist">Interpret</label>
+        <input class="overlay__input" id="song-artist" name="artist" type="text" placeholder="z. B. ABBA" autocomplete="off">
+
+        <label class="field-label" for="song-guest">Dein Name</label>
+        <input class="overlay__input" id="song-guest" name="guestName" type="text" placeholder="Optional" autocomplete="name">
+
+        <p class="overlay__error" id="song-error"></p>
+
+        <button class="overlay__button button-block" type="submit">Wunsch abschicken</button>
+      </form>
+    </div>
+
+    <div class="subpage-content" id="song-success" hidden>
+      <span class="icon">🪩</span>
+      <h2>Danke!</h2>
+      <p>Ist auf unserer Wunschliste 🪩</p>
+      <button class="overlay__button overlay__button--ghost button-block" id="song-again-button" type="button">Noch einen Song wünschen</button>
     </div>
   </div>
+
+  <script src="js/song.js?v=10"></script>
 </body>
 </html>

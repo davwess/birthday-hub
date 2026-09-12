@@ -7,13 +7,14 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 ```
 birthday-hub/
 ├── index.html        # Startseite mit 3 Kacheln
-├── bingo.html         # Bingo-Karte (Phase 4 ✅, Regeln folgen in Phase 5)
+├── bingo.html         # Bingo (Path Bingo, fertig)
 ├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
-├── song.html          # Platzhalter (Phase 6: Songwunsch-Formular)
-├── css/style.css      # Styles (inkl. Bingo-Kategorien, Task-Cards & Overlays)
+├── song.html          # Songwunsch-Formular (Frontend fertig, Sheet-Anbindung offen)
+├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
 ├── js/app.js          # Logik Startseite
 ├── js/questions.js    # Bingo-Aufgabenpool + Kategorien + Quoten (TESTDATEN)
-├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Regeln)
+├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo-Regel)
+├── js/song.js          # Songwunsch-Formular-Logik
 └── assets/             # Bilder etc.
 ```
 
@@ -23,7 +24,10 @@ birthday-hub/
 - Phase 2: Startseite mit 3 Kacheln + Platzhalter-Unterseiten ✅
 - Phase 3: GitHub + GitHub Pages Hosting ✅
 - Phase 4: Bingo-Grundfunktion ✅
-- Phase 5+: Bingo-Regeln verfeinern, Songwunsch-Formular, Google Sheet Anbindung, Fotos-Link – offen
+- Phase 5: Bingo-Regeln verfeinert (Path Bingo) ✅
+- Phase 6a: Songwunsch-Formular (Frontend) ✅
+- Phase 6b: Songwunsch → Google Sheet Anbindung – offen
+- Phase 7+: Zentrale Bingo-Synchronisierung, Fotos-Link – offen
 
 ## Bingo – wie es funktioniert
 
@@ -79,6 +83,19 @@ birthday-hub/
   diese Zahl um 1 erhöhen – alte, nicht mehr passende Spielstände werden dann
   automatisch verworfen und neu erstellt, statt kaputt anzuzeigen. Nach dem
   Party-Start bitte nicht mehr ändern.
+
+## Songwunsch – wie es funktioniert
+
+- Formular mit Songname (Pflichtfeld), Interpret und Name (beide optional).
+  Zeitpunkt wird automatisch erfasst (`timestamp`, ISO-Format).
+- Nach dem Absenden erscheint „Danke! Ist auf unserer Wunschliste 🪩" mit einem
+  Button, um direkt einen weiteren Song zu wünschen.
+- **Noch offen (Phase 6b):** Jeder Wunsch wird aktuell nur lokal im Browser
+  gesichert (`localStorage`, Schlüssel `birthdayHubSongWishes`) – es gibt noch
+  keine zentrale Sammlung. Sobald `SHEET_ENDPOINT_URL` in `js/song.js` mit der
+  echten Google Apps Script-URL befüllt ist, werden Wünsche zusätzlich dorthin
+  gesendet (fire-and-forget, blockiert die Nutzung nicht bei fehlendem Netz).
+  Gäste sehen das Google Sheet nie.
 
 ## Live-URL
 
