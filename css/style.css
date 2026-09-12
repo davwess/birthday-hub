@@ -218,11 +218,11 @@ a {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   gap: 8px;
 }
 
 .cell {
-  aspect-ratio: 1 / 1;
   min-width: 0;
   min-height: 0;
   display: flex;
