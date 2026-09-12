@@ -228,6 +228,34 @@ a {
   margin-top: 8px;
 }
 
+.song-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 56px;
+}
+
+.song-success .icon {
+  font-size: 2.8rem;
+}
+
+.song-success h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.song-success p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 /* ---------- Bingo ---------- */
 
 .bingo-page {
