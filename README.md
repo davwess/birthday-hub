@@ -33,11 +33,11 @@ birthday-hub/
 ## Startseiten-Foto
 
 - `assets/hero.jpg` ist ein eigenes Foto von Bennet & David, oben auf der
-  Startseite als flache Foto-Kachel (`.hero-photo`, Seitenverhältnis 12:5).
-  Titel und Datum liegen als Text direkt auf dem Foto (`.hero-photo__content`),
-  unten mit dunklem Verlauf (`.hero-photo::after`) für Lesbarkeit – ähnlich wie
-  bei einer Reiseführer-Kopfzeile. Spart Höhe gegenüber Foto + Titel getrennt
-  untereinander.
+  Startseite als flache Foto-Kachel (`.hero-photo`, Seitenverhältnis 12:5,
+  dezenter Verlauf unten fürs reine Bild-Finish). Titel, Tagline und Datum
+  stehen wie ursprünglich als separater, zentrierter Text darunter (`.hero h1`,
+  `.tagline`, `.meta`) – nur die Foto-Kachel selbst ist jetzt flacher/kürzer
+  als in der allerersten Version.
 - Das Originalfoto liegt außerhalb des Repos unter
   `30. Geburtstag/WhatsApp Bild David & Bennet.JPG` und wurde eng auf Gesichter/
   Hände zugeschnitten und auf 1000×417 px verkleinert (~90 KB) nach
