@@ -63,3 +63,9 @@ ist die Änderung live unter der URL oben.
 
 **Seite offline nehmen:** Auf GitHub → Repo → Settings → Pages → Source auf **„None"** stellen
 und Save. Wieder online: Source zurück auf **„Deploy from a branch"** → main → Save.
+
+**Browser-Cache bei CSS/JS-Änderungen:** Handys/Browser cachen `style.css` und die
+`.js`-Dateien gerne hartnäckig. Deshalb werden sie in den HTML-Dateien mit einer
+Versionsnummer eingebunden, z. B. `css/style.css?v=2`. Bei jeder inhaltlichen Änderung
+an CSS oder JS die Zahl in **allen** HTML-Dateien um 1 erhöhen (z. B. `?v=3`) – dann lädt
+jeder Browser garantiert die neue Version, ohne dass jemand manuell den Cache leeren muss.
