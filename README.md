@@ -43,6 +43,10 @@ birthday-hub/
 - Jede Frage hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
   einen `text` (volle Frage, erscheint erst beim Antippen). Der finale Fragenpool
   aus dem Sheet sollte beides enthalten.
+- `js/bingo.js` hat oben eine `SCHEMA_VERSION`-Konstante. Falls sich der Aufbau des
+  gespeicherten Spielstands mal ändert (neues Feld o. Ä.), diese Zahl um 1 erhöhen –
+  alte, nicht mehr passende Spielstände werden dann automatisch verworfen und neu
+  erstellt, statt kaputt anzuzeigen. Nach dem Party-Start bitte nicht mehr ändern.
 
 ## Live-URL
 

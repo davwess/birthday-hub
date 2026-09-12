@@ -6,12 +6,23 @@
 
 const STORAGE_KEY = "birthdayHubBingoState";
 
+// Wird erhöht, wenn sich die gespeicherte Datenstruktur ändert (z. B. ein
+// neues Feld pro Frage). Alte Spielstände mit anderer SCHEMA_VERSION werden
+// dann automatisch verworfen und neu generiert, statt kaputt anzuzeigen.
+const SCHEMA_VERSION = 2;
+
 // ---------- Speichern / Laden (localStorage) ----------
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.schemaVersion !== SCHEMA_VERSION) {
+      console.info("Bingo-Spielstand ist veraltet, wird neu erstellt.");
+      return null;
+    }
+    return parsed;
   } catch (e) {
     console.warn("Bingo-Spielstand konnte nicht geladen werden:", e);
     return null;
@@ -55,10 +66,11 @@ function generateCard() {
 
 function createNewState(playerName) {
   return {
+    schemaVersion: SCHEMA_VERSION,
     playerId: makePlayerId(),
     playerName: playerName.trim(),
     createdAt: new Date().toISOString(),
-    cells: generateCard(), // 25 Fragen-Objekte {id, category, text}
+    cells: generateCard(), // 25 Fragen-Objekte {id, category, shortLabel, text}
     progress: new Array(25).fill(null), // gefundene Namen, parallel zu cells
     bingoAt: null,
   };
@@ -138,7 +150,7 @@ function renderGrid() {
 
     cell.innerHTML = foundName
       ? `<span class="cell__check">✓</span><span class="cell__found">${escapeHtml(foundName)}</span>`
-      : `<span class="cell__dot"></span><span class="cell__text">${escapeHtml(question.shortLabel)}</span>`;
+      : `<span class="cell__dot"></span><span class="cell__text">${escapeHtml(question.shortLabel || question.text)}</span>`;
 
     grid.appendChild(cell);
   });
