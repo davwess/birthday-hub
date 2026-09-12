@@ -6,12 +6,13 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 
 ```
 birthday-hub/
-├── index.html        # Startseite mit 3 Kacheln
+├── index.html        # Startseite mit 3 Kacheln + einmaligem Namens-Prompt
 ├── bingo.html         # Bingo (Path Bingo, fertig)
 ├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
-├── song.html          # Songwunsch-Formular (Frontend fertig, Sheet-Anbindung offen)
+├── song.html          # Songwunsch-Formular (Frontend + Sheet-Anbindung fertig)
 ├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
-├── js/app.js          # Logik Startseite
+├── js/app.js          # Logik Startseite (Namens-Prompt)
+├── js/guest.js         # Gemeinsamer Gast-Name (geteilt zwischen Startseite/Bingo/Songwunsch)
 ├── js/questions.js    # Bingo-Aufgabenpool + Kategorien + Quoten (TESTDATEN)
 ├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo-Regel)
 ├── js/song.js          # Songwunsch-Formular-Logik
@@ -83,6 +84,21 @@ birthday-hub/
   diese Zahl um 1 erhöhen – alte, nicht mehr passende Spielstände werden dann
   automatisch verworfen und neu erstellt, statt kaputt anzuzeigen. Nach dem
   Party-Start bitte nicht mehr ändern.
+
+## Gemeinsamer Gast-Name
+
+- `js/guest.js` speichert einen Namen unter dem Schlüssel `birthdayHubGuestName`
+  (localStorage), den Startseite, Bingo und Songwunsch gemeinsam nutzen.
+- Auf der Startseite erscheint beim ersten Besuch einmalig ein Namens-Prompt
+  ("Wie heißt du?"), mit "Überspringen"-Option - wird nicht erneut gezeigt,
+  sobald ein Name gespeichert oder übersprungen wurde
+  (`birthdayHubGuestNamePromptDismissed`).
+- Ist bereits ein Name gespeichert, generiert Bingo direkt eine Karte ohne
+  erneut zu fragen; das Songwunsch-Formular füllt das (weiterhin änderbare)
+  Namensfeld automatisch vor.
+- Wird der Name zuerst bei Bingo oder beim Songwunsch eingegeben (z. B. weil
+  der Prompt übersprungen wurde), wird er dort ebenfalls gespeichert und ist
+  danach auch auf der jeweils anderen Seite vorhanden.
 
 ## Songwunsch – wie es funktioniert
 
