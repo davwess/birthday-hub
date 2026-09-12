@@ -36,9 +36,11 @@ birthday-hub/
   farbigen Punkten auf den Karten und der Gewinnlogik. Sichtbar ist nur der
   Gesamtfortschritt oben rechts (z. B. „7/18“).
 - Beim ersten Öffnen von `bingo.html` wird nach dem Namen gefragt, danach werden
-  die Aufgaben nach Kategorie gruppiert als große, gut lesbare Karten angezeigt –
-  auf dem Handy untereinander, ab Tablet-/Desktop-Breite als Grid nebeneinander.
-- Antippen einer Aufgabe öffnet „Wen hast du gefunden?“. Ist die Aufgabe schon
+  die 18 Aufgaben als Kachel-Raster mit 3 Spalten × 6 Reihen angezeigt (statt der
+  früheren 5×5-Kacheln) – dadurch sind die einzelnen Kacheln größer und besser
+  lesbar. Die Reihenfolge der Kacheln folgt intern der Kategorie-Gruppierung,
+  sichtbar ist das aber nicht.
+- Antippen einer Kachel öffnet „Wen hast du gefunden?“. Ist die Aufgabe schon
   erledigt, bleibt der kurze Aufgabentext weiterhin sichtbar (klein, unter dem
   Haken), zusätzlich zum eingetragenen Namen – nicht nur ein Häkchen.
 - Eine gefundene Person kann nicht zweimal auf derselben Karte verwendet werden –

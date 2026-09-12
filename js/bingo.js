@@ -143,53 +143,33 @@ function renderTopbar() {
   document.getElementById("progress-count").textContent = `${found}/${state.cells.length}`;
 }
 
-// Baut die Aufgaben-Karten gruppiert nach Kategorie auf. Die Kategorie-Namen
-// selbst werden dem Gast bewusst NICHT angezeigt (nur zur internen
-// Gruppierung/Layout/Farbe genutzt) - siehe README.
-function renderCategories() {
-  const container = document.getElementById("bingo-categories");
-  container.innerHTML = "";
+// Baut die 18 Aufgaben als flaches 3x6-Kachel-Raster auf, in der Reihenfolge
+// von state.cells (nach Kategorie gruppiert generiert, siehe generateCard).
+// Die Kategorie-Namen selbst werden dem Gast bewusst NICHT angezeigt - nur
+// der farbige Punkt pro Kachel deutet die Gruppierung dezent an (siehe
+// README).
+function renderGrid() {
+  const grid = document.getElementById("bingo-grid");
+  grid.innerHTML = "";
 
-  CATEGORY_ORDER.forEach((category) => {
-    const indices = [];
-    state.cells.forEach((q, i) => {
-      if (q.category === category) indices.push(i);
-    });
-    if (indices.length === 0) return;
+  state.cells.forEach((question, index) => {
+    const foundName = state.progress[index];
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "cell" + (foundName ? " cell--filled" : "");
+    cell.style.setProperty("--dot-color", CATEGORY_COLORS[question.category] || "#999");
+    cell.addEventListener("click", () => openCellOverlay(index));
 
-    const section = document.createElement("section");
-    section.className = "category";
+    const label = escapeHtml(question.shortLabel || question.text);
 
-    const tasksWrap = document.createElement("div");
-    tasksWrap.className = "category__tasks";
+    cell.innerHTML = foundName
+      ? `<span class="cell__check">✓</span>
+         <span class="cell__text cell__text--done">${label}</span>
+         <span class="cell__found">${escapeHtml(foundName)}</span>`
+      : `<span class="cell__dot"></span>
+         <span class="cell__text">${label}</span>`;
 
-    indices.forEach((index) => {
-      const question = state.cells[index];
-      const foundName = state.progress[index];
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "task-card" + (foundName ? " task-card--filled" : "");
-      card.style.setProperty("--dot-color", CATEGORY_COLORS[question.category] || "#999");
-      card.addEventListener("click", () => openCellOverlay(index));
-
-      const label = escapeHtml(question.shortLabel || question.text);
-
-      card.innerHTML = foundName
-        ? `<span class="task-card__check">✓</span>
-           <span class="task-card__body">
-             <span class="task-card__text task-card__text--done">${label}</span>
-             <span class="task-card__found">${escapeHtml(foundName)}</span>
-           </span>`
-        : `<span class="task-card__dot"></span>
-           <span class="task-card__body">
-             <span class="task-card__text">${label}</span>
-           </span>`;
-
-      tasksWrap.appendChild(card);
-    });
-
-    section.appendChild(tasksWrap);
-    container.appendChild(section);
+    grid.appendChild(cell);
   });
 }
 
@@ -251,7 +231,7 @@ function handleCellSave() {
 
   state.progress[activeCellIndex] = name;
   saveState(state);
-  renderCategories();
+  renderGrid();
   renderTopbar();
   closeCellOverlay();
   checkBingo();
@@ -260,7 +240,7 @@ function handleCellSave() {
 function handleCellDelete() {
   state.progress[activeCellIndex] = null;
   saveState(state);
-  renderCategories();
+  renderGrid();
   renderTopbar();
   closeCellOverlay();
 }
@@ -293,7 +273,7 @@ function init() {
     showNameOverlay();
   } else {
     renderTopbar();
-    renderCategories();
+    renderGrid();
   }
 
   document.getElementById("name-form").addEventListener("submit", (e) => {
@@ -306,7 +286,7 @@ function init() {
     saveState(state);
     hideNameOverlay();
     renderTopbar();
-    renderCategories();
+    renderGrid();
   });
 
   document.getElementById("cell-overlay-save").addEventListener("click", handleCellSave);
