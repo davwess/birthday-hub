@@ -100,20 +100,72 @@ function countPerCategory(progress, cells) {
 // categoryThreshold "Bingo" auslöst (aktuell: 2 von 3 pro Kategorie).
 const CATEGORY_WIN_THRESHOLD = 2;
 
+// Spaltenanzahl des Kachel-Rasters. MUSS zu grid-template-columns in
+// css/style.css (.bingo-grid) passen. Die Zeilenanzahl wird daraus und aus
+// der Aufgabenanzahl automatisch berechnet - Path Bingo funktioniert also
+// auch, wenn später mehr/weniger Reihen dazukommen.
+const BINGO_COLUMNS = 3;
+
+// Prüft, ob es einen durchgehenden Pfad aus erledigten Feldern von der
+// obersten bis zur untersten Reihe gibt. Ein Feld in Reihe r darf dabei nur
+// an ein erledigtes Feld in Reihe r-1 anschließen, das direkt darüber oder
+// diagonal darüber links/rechts liegt (Spalte c-1, c oder c+1).
+//
+// index -> Zeile/Spalte: Zeile = Math.floor(index / columns), Spalte = index % columns.
+// Das entspricht genau der Reihenfolge, in der die Kacheln im CSS-Grid
+// gerendert werden (Grid füllt zeilenweise von links nach rechts).
+function hasVerticalPath(progress, columns) {
+  const totalCells = progress.length;
+  const rows = Math.ceil(totalCells / columns);
+  let reachableInPreviousRow = null;
+
+  for (let row = 0; row < rows; row++) {
+    const reachableInThisRow = [];
+
+    for (let col = 0; col < columns; col++) {
+      const index = row * columns + col;
+      const isFilled = index < totalCells && progress[index] !== null;
+
+      if (!isFilled) {
+        reachableInThisRow.push(false);
+        continue;
+      }
+
+      if (row === 0) {
+        // Oberste Reihe: jedes erledigte Feld startet einen möglichen Pfad.
+        reachableInThisRow.push(true);
+      } else {
+        const connectsUpward = [col - 1, col, col + 1].some(
+          (neighborCol) =>
+            neighborCol >= 0 && neighborCol < columns && reachableInPreviousRow[neighborCol]
+        );
+        reachableInThisRow.push(connectsUpward);
+      }
+    }
+
+    reachableInPreviousRow = reachableInThisRow;
+  }
+
+  // Bingo, sobald mindestens ein Feld in der untersten Reihe über einen
+  // durchgehenden Pfad erreichbar ist.
+  return reachableInPreviousRow.some(Boolean);
+}
+
 const WIN_RULES = {
-  // Aktuell aktiv: jede Kategorie braucht mind. CATEGORY_WIN_THRESHOLD Treffer.
+  // Aktuell aktiv: "Path Bingo" - durchgehender Pfad von oben nach unten.
+  pathBingo: (progress) => hasVerticalPath(progress, BINGO_COLUMNS),
+  // Alternativen, weiterhin verfügbar (einfach oben zuweisen zum Aktivieren):
   categoryThreshold: (progress, cells) => {
     const counts = countPerCategory(progress, cells);
     return CATEGORY_ORDER.every((category) => (counts[category] || 0) >= CATEGORY_WIN_THRESHOLD);
   },
-  // Alternative: wirklich ALLE Aufgaben erledigt (aktuell 18/18).
-  complete: (progress) => progress.every((entry) => entry !== null),
+  complete: (progress) => progress.every((entry) => entry !== null), // wirklich alle Aufgaben erledigt
 };
 
 // Zum Ändern der Gewinnregel einfach eine andere Regel aus WIN_RULES
 // zuweisen. Nach Erreichen von "Bingo" kann trotzdem weitergespielt werden -
 // dafür gibt es hier bewusst keine Sperre.
-const ACTIVE_WIN_RULE = WIN_RULES.categoryThreshold;
+const ACTIVE_WIN_RULE = WIN_RULES.pathBingo;
 
 // ---------- Kategorie-Farben (nur Optik, keine sichtbaren Kategorie-Namen) ----------
 

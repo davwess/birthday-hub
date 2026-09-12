@@ -47,12 +47,23 @@ birthday-hub/
   kategorieübergreifend, nicht nur innerhalb einer Kategorie.
 - Alles wird in `localStorage` gespeichert – ein Neuladen oder Schließen der Seite
   löscht den Fortschritt nicht.
-- **Gewinnregel** (`ACTIVE_WIN_RULE` in `js/bingo.js`): „Bingo“, sobald **jede**
-  der 6 Kategorien mindestens `CATEGORY_WIN_THRESHOLD` Treffer hat (Standard: 2
-  von 3). Danach kann ganz normal weitergespielt werden, bis alle 18 Aufgaben
-  erledigt sind – es gibt keine Sperre nach dem ersten „Bingo“. Zum Ändern der
-  Schwelle einfach die Zahl in `js/bingo.js` anpassen; eine alternative Regel
-  „wirklich alle 18 Aufgaben“ (`WIN_RULES.complete`) ist ebenfalls vorhanden.
+- **Gewinnregel: „Path Bingo"** (`ACTIVE_WIN_RULE` in `js/bingo.js`, aktuell
+  `WIN_RULES.pathBingo`): „Bingo“, sobald es einen durchgehend verbundenen Pfad
+  aus erledigten Kacheln von der obersten bis zur untersten Reihe gibt. Ein
+  erledigtes Feld darf sich dabei mit einem erledigten Feld in der Reihe
+  darunter verbinden, das direkt darunter, diagonal links darunter oder
+  diagonal rechts darunter liegt (nicht mit einem, das zwei Spalten
+  daneben liegt). Es reicht, wenn irgendein gültiger Pfad existiert – der
+  Gast muss dafür nicht gezielt an einem laufenden Pfad weiterarbeiten,
+  jede Aufgabe bleibt jederzeit anklickbar. Nach dem ersten „Bingo“ gibt es
+  keine Sperre; es kann normal weitergespielt werden bis 18/18.
+  Die Pfadprüfung (`hasVerticalPath`) ist nicht auf 6 Reihen fest verdrahtet,
+  sondern berechnet die Zeilenzahl aus der Aufgabenanzahl und der
+  Spaltenzahl (`BINGO_COLUMNS`, muss zum CSS-Grid passen) – funktioniert
+  also automatisch weiter, falls später mehr/weniger Reihen dazukommen.
+  Alternative Regeln (`categoryThreshold`, `complete`) sind weiterhin in
+  `WIN_RULES` vorhanden und lassen sich per Zuweisung an `ACTIVE_WIN_RULE`
+  jederzeit reaktivieren.
 - **Vor der Party:** `js/questions.js` mit den finalen Aufgaben aus dem gemeinsamen
   Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
   verbindung zum Sheet mehr.
