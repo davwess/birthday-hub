@@ -6,21 +6,44 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 
 ```
 birthday-hub/
-├── index.html     # Startseite mit 3 Kacheln
-├── bingo.html     # Platzhalter (Phase 4: echtes Bingo)
-├── fotos.html     # Platzhalter (Phase 8: externer Foto-Link)
-├── song.html      # Platzhalter (Phase 6: Songwunsch-Formular)
-├── css/style.css  # Styles
-├── js/app.js      # Logik
-└── assets/        # Bilder etc.
+├── index.html        # Startseite mit 3 Kacheln
+├── bingo.html         # Bingo-Karte (Phase 4 ✅, Regeln folgen in Phase 5)
+├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
+├── song.html          # Platzhalter (Phase 6: Songwunsch-Formular)
+├── css/style.css      # Styles (inkl. Bingo-Grid & Overlays)
+├── js/app.js          # Logik Startseite
+├── js/questions.js    # Bingo-Fragenpool + Kategorie-Quoten (TESTDATEN)
+├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Regeln)
+└── assets/             # Bilder etc.
 ```
 
 ## Stand
 
 - Phase 1: Grundgerüst ✅
 - Phase 2: Startseite mit 3 Kacheln + Platzhalter-Unterseiten ✅
-- Phase 3: GitHub + GitHub Pages Hosting – offen
-- Phase 4+: Bingo, Songwunsch-Formular, Google Sheet Anbindung, Fotos-Link – offen
+- Phase 3: GitHub + GitHub Pages Hosting ✅
+- Phase 4: Bingo-Grundfunktion ✅
+- Phase 5+: Bingo-Regeln verfeinern, Songwunsch-Formular, Google Sheet Anbindung, Fotos-Link – offen
+
+## Bingo – wie es funktioniert
+
+- Beim ersten Öffnen von `bingo.html` wird nach dem Namen gefragt, danach wird eine
+  zufällige 5×5-Karte aus `js/questions.js` gezogen (pro Kategorie eine feste Anzahl,
+  siehe `CATEGORY_QUOTAS`). Unterschiedliche Gäste bekommen unterschiedliche Karten.
+- Antippen eines Feldes öffnet „Wen hast du gefunden?“. Dieselbe Person kann nicht
+  zweimal auf derselben Karte verwendet werden.
+- Alles wird in `localStorage` gespeichert – ein Neuladen oder Schließen der Seite
+  löscht den Fortschritt nicht.
+- Die Gewinnregel ist bewusst austauschbar: in `js/bingo.js` steht `ACTIVE_WIN_RULE`
+  (aktuell „eine Reihe reicht“). Für „zwei Reihen“ oder „Full House“ genügt es, dort
+  eine andere Regel aus `WIN_RULES` zuzuweisen.
+- **Vor der Party:** `js/questions.js` mit den finalen Fragen aus dem gemeinsamen
+  Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
+  verbindung zum Sheet mehr.
+
+## Live-URL
+
+https://davwess.github.io/birthday-hub/
 
 ## Lokal testen
 
@@ -28,4 +51,12 @@ Einfach `index.html` im Browser öffnen (Doppelklick).
 
 ## Deployment
 
-Noch nicht eingerichtet. Kommt in Phase 3 (GitHub Pages).
+Repo: https://github.com/davwess/birthday-hub (öffentlich, nötig für kostenloses GitHub Pages).
+Hosting: GitHub Pages, Branch `main`, Ordner `/ (root)`.
+
+**Änderungen veröffentlichen:** In GitHub Desktop erscheinen geänderte Dateien automatisch links.
+Unten Commit-Nachricht eintragen → **Commit to main** → oben **Push origin**. Nach ~30–60 Sek.
+ist die Änderung live unter der URL oben.
+
+**Seite offline nehmen:** Auf GitHub → Repo → Settings → Pages → Source auf **„None"** stellen
+und Save. Wieder online: Source zurück auf **„Deploy from a branch"** → main → Save.

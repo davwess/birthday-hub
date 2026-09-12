@@ -7,13 +7,46 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="subpage">
-    <a class="back-link" href="index.html">‹ Zurück</a>
-    <div class="subpage-content">
-      <span class="icon">🎯</span>
-      <h2>Bingo folgt in Kürze</h2>
-      <p>Hier startet bald das Party-Bingo. Komm am Abend einfach hierher zurück.</p>
+  <div class="bingo-page">
+    <div class="bingo-topbar">
+      <a class="back-link" href="index.html">‹ Zurück</a>
+      <div class="bingo-topbar__info">
+        <span id="player-name"></span>
+        <span class="bingo-topbar__progress" id="progress-count"></span>
+      </div>
+    </div>
+
+    <div class="bingo-grid" id="bingo-grid"></div>
+  </div>
+
+  <!-- Name-Eingabe beim ersten Öffnen -->
+  <div class="overlay" id="name-overlay">
+    <form class="overlay__sheet" id="name-form">
+      <h2>Wie heißt du?</h2>
+      <p class="overlay__hint">Dein Name erscheint nur auf deiner eigenen Karte.</p>
+      <input class="overlay__input" id="name-input" type="text" placeholder="Dein Name" required autocomplete="name">
+      <button class="overlay__button" type="submit">Los geht's</button>
+    </form>
+  </div>
+
+  <!-- "Wen hast du gefunden?" -->
+  <div class="overlay" id="cell-overlay">
+    <div class="overlay__sheet">
+      <h2>Wen hast du gefunden?</h2>
+      <p class="overlay__question" id="cell-overlay-question"></p>
+      <input class="overlay__input" id="cell-overlay-input" type="text" placeholder="Name der Person" autocomplete="off">
+      <p class="overlay__error" id="cell-overlay-error"></p>
+      <div class="overlay__actions">
+        <button class="overlay__button overlay__button--ghost" id="cell-overlay-delete" type="button" hidden>Löschen</button>
+        <button class="overlay__button overlay__button--ghost" id="cell-overlay-cancel" type="button">Abbrechen</button>
+        <button class="overlay__button" id="cell-overlay-save" type="button">Speichern</button>
+      </div>
     </div>
   </div>
+
+  <div class="toast" id="bingo-toast">🎉 Bingo!</div>
+
+  <script src="js/questions.js"></script>
+  <script src="js/bingo.js"></script>
 </body>
 </html>
