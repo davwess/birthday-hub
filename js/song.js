@@ -1,15 +1,13 @@
 // ============================================================
 // Songwunsch-Formular
 // ============================================================
-// Phase 6a (aktuell): Formular + Erfolgsmeldung, lokale Sicherungskopie.
-// Phase 6b (später): SHEET_ENDPOINT_URL mit der echten Google Apps Script
-// Web-App-URL befüllen, sobald das Sheet eingerichtet ist - siehe README.
-// Bis dahin werden Wünsche nur lokal im Browser gesichert, das Formular
-// funktioniert aber schon vollständig (inkl. Erfolgsmeldung).
+// Formular + Erfolgsmeldung, lokale Sicherungskopie UND zentrale Ablage
+// im Google Sheet über die Apps Script Web-App (siehe
+// ../google-apps-script/Code.gs, README für Details).
 // ============================================================
 
-// Leer lassen, bis die Google-Sheet-Anbindung eingerichtet ist (Phase 6b).
-const SHEET_ENDPOINT_URL = "";
+const SHEET_ENDPOINT_URL =
+  "https://script.google.com/macros/s/AKfycbzD5PvFIM03gTXpLKSLCtSkD3tc_u1EE0kEnZoICtm__g8MNpF9Nc3Ur6Xv72CCDW5f/exec";
 
 const LOCAL_BACKUP_KEY = "birthdayHubSongWishes";
 

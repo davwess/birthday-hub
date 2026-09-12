@@ -90,12 +90,37 @@ birthday-hub/
   Zeitpunkt wird automatisch erfasst (`timestamp`, ISO-Format).
 - Nach dem Absenden erscheint „Danke! Ist auf unserer Wunschliste 🪩" mit einem
   Button, um direkt einen weiteren Song zu wünschen.
-- **Noch offen (Phase 6b):** Jeder Wunsch wird aktuell nur lokal im Browser
-  gesichert (`localStorage`, Schlüssel `birthdayHubSongWishes`) – es gibt noch
-  keine zentrale Sammlung. Sobald `SHEET_ENDPOINT_URL` in `js/song.js` mit der
-  echten Google Apps Script-URL befüllt ist, werden Wünsche zusätzlich dorthin
-  gesendet (fire-and-forget, blockiert die Nutzung nicht bei fehlendem Netz).
-  Gäste sehen das Google Sheet nie.
+- Jeder Wunsch wird zusätzlich lokal im Browser gesichert (`localStorage`,
+  Schlüssel `birthdayHubSongWishes`) als einfaches Backup.
+- Sobald `SHEET_ENDPOINT_URL` in `js/song.js` mit der Apps-Script-URL befüllt
+  ist, werden Wünsche zusätzlich zentral ins Google Sheet gesendet
+  (fire-and-forget, blockiert die Nutzung nicht bei fehlendem Netz). Gäste
+  sehen das Google Sheet nie.
+
+### Google Sheet, Apps Script & Host-Dashboard
+
+Das Backend (Songwünsche entgegennehmen) und das Host-Dashboard (offene
+Wünsche ansehen, als gespielt markieren) laufen komplett in **Google Apps
+Script** – bewusst NICHT im GitHub-Repo, weil dieses öffentlich ist und sich
+darin kein Geheimnis (Zugriffsschlüssel) verstecken lässt.
+
+- Referenzcode liegt zur eigenen Ablage in `../google-apps-script/` (also
+  **außerhalb** von `birthday-hub`, nicht Teil des Git-Repos):
+  `Code.gs` (Backend + Dashboard-Logik) und `Dashboard.html` (Host-Ansicht).
+  Diese Dateien werden 1:1 in den Google Apps Script Editor eingefügt.
+- In `Code.gs` ganz oben: `HOST_KEY` durch einen selbst ausgedachten, langen
+  Schlüssel ersetzen – der lebt nur in Google, taucht nirgends im
+  GitHub-Code auf.
+- Das Dashboard ist über `<Apps-Script-URL>?key=<HOST_KEY>` erreichbar (GET).
+  Ohne oder mit falschem Schlüssel erscheint nur "Kein Zugriff". Diese URL
+  (mit Schlüssel) bitte nur privat teilen (z. B. per WhatsApp an Bennet und
+  die DJs) – nie im Repo oder öffentlich posten.
+- Dashboard-Funktionen: offene/alle Wünsche, sortiert nach Zeit (älteste
+  zuerst), Zähler offener Wünsche, "Als gespielt markieren" (inkl. Rückgängig),
+  automatische Aktualisierung alle 20 Sekunden.
+- Google Sheet-Spalten: Zeit, Song, Interpret, Gast, Gespielt. Der Zeitstempel
+  wird beim Empfang serverseitig gesetzt (zuverlässiger als die Uhrzeit des
+  Gäste-Handys).
 
 ## Live-URL
 
