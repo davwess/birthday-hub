@@ -334,7 +334,17 @@ function init() {
   state = loadState();
 
   if (!state) {
-    showNameOverlay();
+    // Wurde der Name schon auf der Startseite (oder beim Songwunsch) erfasst,
+    // direkt eine Karte erzeugen statt erneut zu fragen.
+    const sharedName = getGuestName();
+    if (sharedName) {
+      state = createNewState(sharedName);
+      saveState(state);
+      renderTopbar();
+      renderGrid();
+    } else {
+      showNameOverlay();
+    }
   } else {
     renderTopbar();
     renderGrid();
@@ -349,6 +359,7 @@ function init() {
     const name = nameInput.value.trim();
     if (!name) return;
 
+    setGuestName(name); // für Songwunsch & künftige Besuche merken
     state = createNewState(name);
     saveState(state);
     hideNameOverlay();

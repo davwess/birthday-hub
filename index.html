@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Bennet & David – 30</title>
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=14">
 </head>
 <body>
   <main class="page">
@@ -42,6 +42,19 @@
 
     <p class="footer-note">Wir freuen uns auf euch!</p>
   </main>
-  <script src="js/app.js?v=13"></script>
+
+  <!-- Einmaliger Namens-Prompt, damit Bingo & Songwunsch ihn nicht erneut abfragen -->
+  <div class="overlay" id="name-overlay">
+    <form class="overlay__sheet" id="name-form">
+      <h2>Wie heißt du?</h2>
+      <p class="overlay__hint">Dann musst du deinen Namen bei Bingo & Songwunsch nicht nochmal eintippen.</p>
+      <input class="overlay__input" id="name-input" type="text" placeholder="Dein Name" autocomplete="name">
+      <button class="overlay__button button-block" type="submit">Speichern</button>
+      <button class="overlay__button overlay__button--ghost button-block" type="button" id="name-skip-button">Überspringen</button>
+    </form>
+  </div>
+
+  <script src="js/guest.js?v=14"></script>
+  <script src="js/app.js?v=14"></script>
 </body>
 </html>

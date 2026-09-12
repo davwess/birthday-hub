@@ -52,13 +52,18 @@ function showForm() {
 function init() {
   const form = document.getElementById("song-form");
   const errorEl = document.getElementById("song-error");
+  const guestInput = document.getElementById("song-guest");
+
+  // Namen vorausfüllen, falls schon auf der Startseite oder bei Bingo
+  // eingegeben - bleibt trotzdem änderbar/löschbar.
+  guestInput.value = getGuestName();
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const songTitle = document.getElementById("song-title").value.trim();
     const artist = document.getElementById("song-artist").value.trim();
-    const guestName = document.getElementById("song-guest").value.trim();
+    const guestName = guestInput.value.trim();
 
     if (!songTitle) {
       errorEl.textContent = "Bitte mindestens einen Songnamen eintragen.";
@@ -76,7 +81,12 @@ function init() {
     saveWishLocally(wish);
     sendWishToSheet(wish);
 
+    if (guestName) {
+      setGuestName(guestName); // für Bingo & künftige Besuche synchron halten
+    }
+
     form.reset();
+    guestInput.value = getGuestName(); // Vorausfüllung nach dem Reset wiederherstellen
     showSuccess();
   });
 
