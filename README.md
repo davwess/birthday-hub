@@ -10,9 +10,9 @@ birthday-hub/
 ├── bingo.html         # Bingo-Karte (Phase 4 ✅, Regeln folgen in Phase 5)
 ├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
 ├── song.html          # Platzhalter (Phase 6: Songwunsch-Formular)
-├── css/style.css      # Styles (inkl. Bingo-Grid & Overlays)
+├── css/style.css      # Styles (inkl. Bingo-Kategorien, Task-Cards & Overlays)
 ├── js/app.js          # Logik Startseite
-├── js/questions.js    # Bingo-Fragenpool + Kategorie-Quoten (TESTDATEN)
+├── js/questions.js    # Bingo-Aufgabenpool + Kategorien + Quoten (TESTDATEN)
 ├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Regeln)
 └── assets/             # Bilder etc.
 ```
@@ -27,29 +27,41 @@ birthday-hub/
 
 ## Bingo – wie es funktioniert
 
-- Beim ersten Öffnen von `bingo.html` wird nach dem Namen gefragt, danach wird eine
-  zufällige 5×5-Karte aus `js/questions.js` gezogen (pro Kategorie eine feste Anzahl,
-  siehe `CATEGORY_QUOTAS`). Unterschiedliche Gäste bekommen unterschiedliche Karten.
-- Antippen eines Feldes öffnet „Wen hast du gefunden?“. Dieselbe Person kann nicht
-  zweimal auf derselben Karte verwendet werden.
+- **Struktur:** 6 Kategorien × 3 Aufgaben = 18 Aufgaben insgesamt (`CATEGORY_ORDER`,
+  `QUESTION_POOL`, `CATEGORY_QUOTAS` in `js/questions.js`). Aktuelle Platzhalter-
+  Kategorien: Bennet, David, Bennet & David, Freunde & Vergangenheit,
+  Reisen & Erlebnisse, Random / Party.
+- **Kategorien werden den Gästen bewusst nicht angezeigt** (kein Name, kein
+  Fortschritt pro Kategorie) – sie dienen nur intern der Gruppierung, den
+  farbigen Punkten auf den Karten und der Gewinnlogik. Sichtbar ist nur der
+  Gesamtfortschritt oben rechts (z. B. „7/18“).
+- Beim ersten Öffnen von `bingo.html` wird nach dem Namen gefragt, danach werden
+  die Aufgaben nach Kategorie gruppiert als große, gut lesbare Karten angezeigt –
+  auf dem Handy untereinander, ab Tablet-/Desktop-Breite als Grid nebeneinander.
+- Antippen einer Aufgabe öffnet „Wen hast du gefunden?“. Ist die Aufgabe schon
+  erledigt, bleibt der kurze Aufgabentext weiterhin sichtbar (klein, unter dem
+  Haken), zusätzlich zum eingetragenen Namen – nicht nur ein Häkchen.
+- Eine gefundene Person kann nicht zweimal auf derselben Karte verwendet werden –
+  kategorieübergreifend, nicht nur innerhalb einer Kategorie.
 - Alles wird in `localStorage` gespeichert – ein Neuladen oder Schließen der Seite
   löscht den Fortschritt nicht.
-- Die Gewinnregel ist bewusst austauschbar: in `js/bingo.js` steht `ACTIVE_WIN_RULE`.
-  Aktuell aktiv: **„pro Kategorie mindestens `CATEGORY_WIN_THRESHOLD` Treffer“**
-  (Standard: 3 von 5, unabhängig von der Position auf der Karte). Die Zahl einfach
-  in `js/bingo.js` ändern (z. B. auf 2). Die alten reihenbasierten Regeln
-  (`oneLine`, `twoLines`, `fullHouse`) sind weiterhin vorhanden und lassen sich per
-  Zuweisung an `ACTIVE_WIN_RULE` jederzeit reaktivieren.
-- **Vor der Party:** `js/questions.js` mit den finalen Fragen aus dem gemeinsamen
+- **Gewinnregel** (`ACTIVE_WIN_RULE` in `js/bingo.js`): „Bingo“, sobald **jede**
+  der 6 Kategorien mindestens `CATEGORY_WIN_THRESHOLD` Treffer hat (Standard: 2
+  von 3). Danach kann ganz normal weitergespielt werden, bis alle 18 Aufgaben
+  erledigt sind – es gibt keine Sperre nach dem ersten „Bingo“. Zum Ändern der
+  Schwelle einfach die Zahl in `js/bingo.js` anpassen; eine alternative Regel
+  „wirklich alle 18 Aufgaben“ (`WIN_RULES.complete`) ist ebenfalls vorhanden.
+- **Vor der Party:** `js/questions.js` mit den finalen Aufgaben aus dem gemeinsamen
   Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
   verbindung zum Sheet mehr.
-- Jede Frage hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
-  einen `text` (volle Frage, erscheint erst beim Antippen). Der finale Fragenpool
-  aus dem Sheet sollte beides enthalten.
+- Jede Aufgabe hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
+  einen `text` (volle Aufgabe, erscheint erst beim Antippen). Der finale
+  Aufgabenpool aus dem Sheet sollte beides enthalten.
 - `js/bingo.js` hat oben eine `SCHEMA_VERSION`-Konstante. Falls sich der Aufbau des
-  gespeicherten Spielstands mal ändert (neues Feld o. Ä.), diese Zahl um 1 erhöhen –
-  alte, nicht mehr passende Spielstände werden dann automatisch verworfen und neu
-  erstellt, statt kaputt anzuzeigen. Nach dem Party-Start bitte nicht mehr ändern.
+  gespeicherten Spielstands mal ändert (neues Feld, andere Aufgabenanzahl o. Ä.),
+  diese Zahl um 1 erhöhen – alte, nicht mehr passende Spielstände werden dann
+  automatisch verworfen und neu erstellt, statt kaputt anzuzeigen. Nach dem
+  Party-Start bitte nicht mehr ändern.
 
 ## Live-URL
 

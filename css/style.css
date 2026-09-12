@@ -214,81 +214,111 @@ a {
   font-weight: 600;
 }
 
-.bingo-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  gap: 8px;
-}
-
-.cell {
-  min-width: 0;
-  min-height: 0;
+.bingo-categories {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+/* Ab Tablet-Breite: Kategorien als übersichtliches Grid statt Liste */
+@media (min-width: 720px) {
+  .bingo-categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
+}
+
+@media (min-width: 1080px) {
+  .bingo-categories {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Ein Block pro Kategorie - Kategorie-Name/-Fortschritt wird den Gästen
+   bewusst nicht angezeigt, nur intern für Gruppierung/Farbe/Gewinnlogik
+   genutzt (siehe README). */
+.category {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 10px;
+}
+
+.category__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-card {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 4px;
+  gap: 14px;
+  padding: 16px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 10px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 6px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
   color: var(--text);
   font-family: inherit;
+  text-align: left;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.cell:active {
-  transform: scale(0.95);
+.task-card:active {
+  transform: scale(0.97);
 }
 
-.cell__dot {
-  width: 8px;
-  height: 8px;
+.task-card__dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--dot-color, #999);
   flex-shrink: 0;
 }
 
-.cell__text {
-  font-size: clamp(0.8rem, 3.6vw, 0.95rem);
-  font-weight: 500;
-  line-height: 1.18;
-  color: var(--text);
-  text-align: center;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+.task-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.cell--filled {
+.task-card__text {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.task-card--filled {
   background: var(--accent-soft);
   border-color: var(--accent);
 }
 
-.cell__check {
-  font-size: 1.05rem;
-  color: var(--accent);
+.task-card__text--done {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
-.cell__found {
-  font-size: clamp(0.78rem, 3.4vw, 0.9rem);
-  font-weight: 600;
-  line-height: 1.18;
-  text-align: center;
-  overflow: hidden;
+.task-card__check {
+  font-size: 1.2rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.task-card__found {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
   overflow-wrap: break-word;
   word-break: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }
 
 /* ---------- Overlays (Bottom Sheets) ---------- */

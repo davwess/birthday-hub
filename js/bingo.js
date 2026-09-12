@@ -1,15 +1,16 @@
 // ============================================================
 // Bingo-Logik
-// Benötigt QUESTION_POOL und CATEGORY_QUOTAS aus js/questions.js
-// (in bingo.html VOR dieser Datei eingebunden).
+// Benötigt CATEGORY_ORDER, QUESTION_POOL und CATEGORY_QUOTAS aus
+// js/questions.js (in bingo.html VOR dieser Datei eingebunden).
 // ============================================================
 
 const STORAGE_KEY = "birthdayHubBingoState";
 
-// Wird erhöht, wenn sich die gespeicherte Datenstruktur ändert (z. B. ein
-// neues Feld pro Frage). Alte Spielstände mit anderer SCHEMA_VERSION werden
-// dann automatisch verworfen und neu generiert, statt kaputt anzuzeigen.
-const SCHEMA_VERSION = 2;
+// Wird erhöht, wenn sich die gespeicherte Datenstruktur ändert (z. B. Anzahl
+// oder Zuschnitt der Aufgaben). Alte Spielstände mit anderer SCHEMA_VERSION
+// werden dann automatisch verworfen und neu generiert, statt kaputt
+// anzuzeigen.
+const SCHEMA_VERSION = 3;
 
 // ---------- Speichern / Laden (localStorage) ----------
 
@@ -53,55 +54,37 @@ function shuffle(list) {
   return copy;
 }
 
-// Zieht pro Kategorie die passende Anzahl Fragen (siehe CATEGORY_QUOTAS)
-// zufällig aus dem Pool und mischt die 25 Fragen anschließend auf dem Grid.
+// Zieht pro Kategorie die passende Anzahl Aufgaben (siehe CATEGORY_QUOTAS)
+// zufällig aus dem Pool. Reihenfolge innerhalb einer Kategorie wird gemischt;
+// die Kategorien selbst bleiben in CATEGORY_ORDER (fürs Layout).
 function generateCard() {
   let picked = [];
-  Object.entries(CATEGORY_QUOTAS).forEach(([category, quota]) => {
+  CATEGORY_ORDER.forEach((category) => {
+    const quota = CATEGORY_QUOTAS[category] || 0;
     const poolForCategory = QUESTION_POOL.filter((q) => q.category === category);
     picked = picked.concat(shuffle(poolForCategory).slice(0, quota));
   });
-  return shuffle(picked);
+  return picked;
 }
 
 function createNewState(playerName) {
+  const cells = generateCard(); // Aufgaben-Objekte {id, category, shortLabel, text}
   return {
     schemaVersion: SCHEMA_VERSION,
     playerId: makePlayerId(),
     playerName: playerName.trim(),
     createdAt: new Date().toISOString(),
-    cells: generateCard(), // 25 Fragen-Objekte {id, category, shortLabel, text}
-    progress: new Array(25).fill(null), // gefundene Namen, parallel zu cells
+    cells,
+    progress: new Array(cells.length).fill(null), // gefundene Namen, parallel zu cells
     bingoAt: null,
   };
 }
 
-// ---------- Bingo-Regeln ----------
-// Bewusst getrennt von der restlichen Logik, damit wir die Gewinn-
-// bedingung später leicht ändern können (z. B. zwei Reihen, Full House).
-
-function buildLines() {
-  const lines = [];
-  for (let row = 0; row < 5; row++) {
-    lines.push([0, 1, 2, 3, 4].map((col) => row * 5 + col));
-  }
-  for (let col = 0; col < 5; col++) {
-    lines.push([0, 1, 2, 3, 4].map((row) => row * 5 + col));
-  }
-  lines.push([0, 6, 12, 18, 24]); // Diagonale \
-  lines.push([4, 8, 12, 16, 20]); // Diagonale /
-  return lines;
-}
-const LINES = buildLines();
-
-function countCompletedLines(progress) {
-  const filled = progress.map((entry) => entry !== null);
-  return LINES.filter((line) => line.every((index) => filled[index])).length;
-}
+// ---------- Gewinnregeln ----------
+// Bewusst getrennt von der restlichen Logik, damit wir die Gewinnbedingung
+// später leicht ändern können.
 
 // Zählt, wie viele Treffer pro Kategorie schon eingetragen sind.
-// Braucht zusätzlich zu progress auch cells, weil dort steht, welche
-// Kategorie zu welchem Feld gehört.
 function countPerCategory(progress, cells) {
   const counts = {};
   progress.forEach((entry, index) => {
@@ -113,37 +96,34 @@ function countPerCategory(progress, cells) {
   return counts;
 }
 
-// Mindestanzahl Treffer, die JEDE Kategorie erreichen muss, damit die
-// categoryThreshold-Regel unten "Bingo" auslöst.
-const CATEGORY_WIN_THRESHOLD = 3;
+// Mindestanzahl Treffer, die JEDE Kategorie erreichen muss, damit
+// categoryThreshold "Bingo" auslöst (aktuell: 2 von 3 pro Kategorie).
+const CATEGORY_WIN_THRESHOLD = 2;
 
 const WIN_RULES = {
-  oneLine: (progress) => countCompletedLines(progress) >= 1,
-  twoLines: (progress) => countCompletedLines(progress) >= 2,
-  fullHouse: (progress) => progress.every((entry) => entry !== null),
-  // Neu: keine Reihen/Spalten mehr nötig - stattdessen muss jede Kategorie
-  // mindestens CATEGORY_WIN_THRESHOLD Treffer haben.
+  // Aktuell aktiv: jede Kategorie braucht mind. CATEGORY_WIN_THRESHOLD Treffer.
   categoryThreshold: (progress, cells) => {
     const counts = countPerCategory(progress, cells);
-    return Object.keys(CATEGORY_QUOTAS).every(
-      (category) => (counts[category] || 0) >= CATEGORY_WIN_THRESHOLD
-    );
+    return CATEGORY_ORDER.every((category) => (counts[category] || 0) >= CATEGORY_WIN_THRESHOLD);
   },
+  // Alternative: wirklich ALLE Aufgaben erledigt (aktuell 18/18).
+  complete: (progress) => progress.every((entry) => entry !== null),
 };
 
-// Aktive Regel: pro Kategorie mind. CATEGORY_WIN_THRESHOLD Treffer, egal wo
-// auf der Karte. Zum Ändern (z. B. zurück auf "eine Reihe reicht") einfach
-// eine andere Regel aus WIN_RULES zuweisen.
+// Zum Ändern der Gewinnregel einfach eine andere Regel aus WIN_RULES
+// zuweisen. Nach Erreichen von "Bingo" kann trotzdem weitergespielt werden -
+// dafür gibt es hier bewusst keine Sperre.
 const ACTIVE_WIN_RULE = WIN_RULES.categoryThreshold;
 
-// ---------- Kategorie-Farben (nur Optik) ----------
+// ---------- Kategorie-Farben (nur Optik, keine sichtbaren Kategorie-Namen) ----------
 
 const CATEGORY_COLORS = {
-  "Reisen": "#7fb8d6",
-  "Job & Karriere": "#c98fd1",
-  "Fun Facts": "#e0a86a",
-  "Beziehung & Familie": "#e28b9c",
-  "Party & Nightlife": "#9fcf8f",
+  "Bennet": "#7fb8d6",
+  "David": "#c98fd1",
+  "Bennet & David": "#e28b9c",
+  "Freunde & Vergangenheit": "#9fcf8f",
+  "Reisen & Erlebnisse": "#e0a86a",
+  "Random / Party": "#6bc8c2",
 };
 
 // ---------- Rendering ----------
@@ -160,26 +140,56 @@ function escapeHtml(text) {
 function renderTopbar() {
   const found = state.progress.filter((entry) => entry !== null).length;
   document.getElementById("player-name").textContent = state.playerName;
-  document.getElementById("progress-count").textContent = `${found}/25`;
+  document.getElementById("progress-count").textContent = `${found}/${state.cells.length}`;
 }
 
-function renderGrid() {
-  const grid = document.getElementById("bingo-grid");
-  grid.innerHTML = "";
+// Baut die Aufgaben-Karten gruppiert nach Kategorie auf. Die Kategorie-Namen
+// selbst werden dem Gast bewusst NICHT angezeigt (nur zur internen
+// Gruppierung/Layout/Farbe genutzt) - siehe README.
+function renderCategories() {
+  const container = document.getElementById("bingo-categories");
+  container.innerHTML = "";
 
-  state.cells.forEach((question, index) => {
-    const foundName = state.progress[index];
-    const cell = document.createElement("button");
-    cell.type = "button";
-    cell.className = "cell" + (foundName ? " cell--filled" : "");
-    cell.style.setProperty("--dot-color", CATEGORY_COLORS[question.category] || "#999");
-    cell.addEventListener("click", () => openCellOverlay(index));
+  CATEGORY_ORDER.forEach((category) => {
+    const indices = [];
+    state.cells.forEach((q, i) => {
+      if (q.category === category) indices.push(i);
+    });
+    if (indices.length === 0) return;
 
-    cell.innerHTML = foundName
-      ? `<span class="cell__check">✓</span><span class="cell__found">${escapeHtml(foundName)}</span>`
-      : `<span class="cell__dot"></span><span class="cell__text">${escapeHtml(question.shortLabel || question.text)}</span>`;
+    const section = document.createElement("section");
+    section.className = "category";
 
-    grid.appendChild(cell);
+    const tasksWrap = document.createElement("div");
+    tasksWrap.className = "category__tasks";
+
+    indices.forEach((index) => {
+      const question = state.cells[index];
+      const foundName = state.progress[index];
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "task-card" + (foundName ? " task-card--filled" : "");
+      card.style.setProperty("--dot-color", CATEGORY_COLORS[question.category] || "#999");
+      card.addEventListener("click", () => openCellOverlay(index));
+
+      const label = escapeHtml(question.shortLabel || question.text);
+
+      card.innerHTML = foundName
+        ? `<span class="task-card__check">✓</span>
+           <span class="task-card__body">
+             <span class="task-card__text task-card__text--done">${label}</span>
+             <span class="task-card__found">${escapeHtml(foundName)}</span>
+           </span>`
+        : `<span class="task-card__dot"></span>
+           <span class="task-card__body">
+             <span class="task-card__text">${label}</span>
+           </span>`;
+
+      tasksWrap.appendChild(card);
+    });
+
+    section.appendChild(tasksWrap);
+    container.appendChild(section);
   });
 }
 
@@ -193,7 +203,7 @@ function hideNameOverlay() {
   document.getElementById("name-overlay").classList.remove("overlay--visible");
 }
 
-// ---------- Feld-Overlay ("Wen hast du gefunden?") ----------
+// ---------- Aufgaben-Overlay ("Wen hast du gefunden?") ----------
 
 function openCellOverlay(index) {
   activeCellIndex = index;
@@ -216,6 +226,8 @@ function closeCellOverlay() {
   activeCellIndex = null;
 }
 
+// Eine gefundene Person darf nur einmal auf der GESAMTEN Karte verwendet
+// werden (kategorieübergreifend), nicht nur innerhalb einer Kategorie.
 function isNameTakenElsewhere(name, exceptIndex) {
   const normalized = name.trim().toLowerCase();
   return state.progress.some(
@@ -233,13 +245,13 @@ function handleCellSave() {
     return;
   }
   if (isNameTakenElsewhere(name, activeCellIndex)) {
-    errorEl.textContent = "Diese Person hast du schon für ein anderes Feld eingetragen.";
+    errorEl.textContent = "Diese Person hast du schon für eine andere Aufgabe eingetragen.";
     return;
   }
 
   state.progress[activeCellIndex] = name;
   saveState(state);
-  renderGrid();
+  renderCategories();
   renderTopbar();
   closeCellOverlay();
   checkBingo();
@@ -248,15 +260,17 @@ function handleCellSave() {
 function handleCellDelete() {
   state.progress[activeCellIndex] = null;
   saveState(state);
-  renderGrid();
+  renderCategories();
   renderTopbar();
   closeCellOverlay();
 }
 
 // ---------- Bingo-Check ----------
+// Nach Erreichen von "Bingo" bleibt das Spiel offen - Gäste können weiter
+// Aufgaben eintragen, bis maximal alle erledigt sind.
 
 function checkBingo() {
-  if (state.bingoAt) return; // schon erreicht, nicht erneut feiern
+  if (state.bingoAt) return; // "Bingo" schon einmal gefeiert, nicht erneut anzeigen
   if (ACTIVE_WIN_RULE(state.progress, state.cells)) {
     state.bingoAt = new Date().toISOString();
     saveState(state);
@@ -279,7 +293,7 @@ function init() {
     showNameOverlay();
   } else {
     renderTopbar();
-    renderGrid();
+    renderCategories();
   }
 
   document.getElementById("name-form").addEventListener("submit", (e) => {
@@ -292,7 +306,7 @@ function init() {
     saveState(state);
     hideNameOverlay();
     renderTopbar();
-    renderGrid();
+    renderCategories();
   });
 
   document.getElementById("cell-overlay-save").addEventListener("click", handleCellSave);
