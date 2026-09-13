@@ -519,9 +519,18 @@ a {
   margin-top: 4px;
 }
 
-.overlay__button {
+/* flex:1 nur hier, wo zwei Buttons sich eine Reihe teilen - nicht in der
+   allgemeinen .overlay__button-Regel, sonst wächst ein einzelner Button
+   (z. B. button-block außerhalb von .overlay__actions) auf die ganze Höhe
+   seines Flex-Elternelements. */
+.overlay__actions .overlay__button {
   flex: 1;
-  display: inline-block;
+}
+
+.overlay__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 14px;
   border-radius: 12px;
   border: none;
