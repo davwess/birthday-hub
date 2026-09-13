@@ -12,7 +12,7 @@ birthday-hub/
 ├── song.html          # Songwunsch-Formular (Frontend + Sheet-Anbindung fertig)
 ├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
 ├── js/app.js          # Logik Startseite (Namens-Prompt)
-├── js/guest.js         # Gemeinsamer Gast-Name (geteilt zwischen Startseite/Bingo/Songwunsch)
+├── js/guest.js         # Gemeinsamer Gast-Name + Sheet-Anbindung (geteilt: Startseite/Bingo/Songwunsch)
 ├── js/questions.js    # Bingo-Aufgabenpool (25 finale Fragen aus Fragenliste BINGO.xlsx)
 ├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo-Regel)
 ├── js/song.js          # Songwunsch-Formular-Logik
@@ -29,7 +29,7 @@ birthday-hub/
 - Phase 6a: Songwunsch-Formular (Frontend) ✅
 - Phase 6b: Songwunsch → Google Sheet + Host-Dashboard ✅
 - Bingo-Fragenpool: finale 25 Fragen aus `Fragenliste BINGO.xlsx` ✅
-- Phase 7: Zentrale Bingo-Synchronisierung – offen
+- Phase 7: Zentrale Bingo-Synchronisierung (Bingo-Log im Google Sheet) ✅
 - Phase 8: Fotos-Link, Design-Politur, Gesamttest – offen
 
 ## Startseiten-Foto
@@ -137,17 +137,17 @@ birthday-hub/
   Button, um direkt einen weiteren Song zu wünschen.
 - Jeder Wunsch wird zusätzlich lokal im Browser gesichert (`localStorage`,
   Schlüssel `birthdayHubSongWishes`) als einfaches Backup.
-- Sobald `SHEET_ENDPOINT_URL` in `js/song.js` mit der Apps-Script-URL befüllt
+- Sobald `SHEET_ENDPOINT_URL` in `js/guest.js` mit der Apps-Script-URL befüllt
   ist, werden Wünsche zusätzlich zentral ins Google Sheet gesendet
   (fire-and-forget, blockiert die Nutzung nicht bei fehlendem Netz). Gäste
   sehen das Google Sheet nie.
 
 ### Google Sheet, Apps Script & Host-Dashboard
 
-Das Backend (Songwünsche entgegennehmen) und das Host-Dashboard (offene
-Wünsche ansehen, als gespielt markieren) laufen komplett in **Google Apps
-Script** – bewusst NICHT im GitHub-Repo, weil dieses öffentlich ist und sich
-darin kein Geheimnis (Zugriffsschlüssel) verstecken lässt.
+Das Backend (Songwünsche + Bingo-Log entgegennehmen) und das Host-Dashboard
+(offene Songwünsche ansehen, als gespielt markieren) laufen komplett in
+**Google Apps Script** – bewusst NICHT im GitHub-Repo, weil dieses öffentlich
+ist und sich darin kein Geheimnis (Zugriffsschlüssel) verstecken lässt.
 
 - Referenzcode liegt zur eigenen Ablage in `../google-apps-script/` (also
   **außerhalb** von `birthday-hub`, nicht Teil des Git-Repos):
@@ -163,9 +163,37 @@ darin kein Geheimnis (Zugriffsschlüssel) verstecken lässt.
 - Dashboard-Funktionen: offene/alle Wünsche, sortiert nach Zeit (älteste
   zuerst), Zähler offener Wünsche, "Als gespielt markieren" (inkl. Rückgängig),
   automatische Aktualisierung alle 20 Sekunden.
-- Google Sheet-Spalten: Zeit, Song, Interpret, Gast, Gespielt. Der Zeitstempel
-  wird beim Empfang serverseitig gesetzt (zuverlässiger als die Uhrzeit des
-  Gäste-Handys).
+- Google Sheet-Spalten (Tabelle "Songwünsche"): Zeit, Song, Interpret, Gast,
+  Gespielt. Der Zeitstempel wird beim Empfang serverseitig gesetzt
+  (zuverlässiger als die Uhrzeit des Gäste-Handys).
+- **Ein `doPost` für beides:** `song.js` und `bingo.js` senden beide an
+  dieselbe `SHEET_ENDPOINT_URL` (liegt gemeinsam in `js/guest.js`,
+  `sendToSheet()`). Ein `type`-Feld im gesendeten Objekt entscheidet in
+  `Code.gs`, welche Tabelle beschrieben wird: ohne `type` (Songwunsch) ->
+  "Songwünsche", mit `"type":"bingo"` -> "Bingo".
+- **Bingo-Log (Phase 7):** Sobald ein Gast zum ersten Mal "Bingo" erreicht
+  (`checkBingo()` in `js/bingo.js`), wird einmalig Name + Fortschritt (z. B.
+  "18/18") in die Tabelle "Bingo" geschrieben – kein Live-Leaderboard, nur ein
+  einfaches Log für euch als Gastgeber, wer wann Bingo hatte. Die Tabelle wird
+  beim ersten Aufruf automatisch angelegt.
+- **Nach jeder Änderung an `Code.gs`:** im Apps-Script-Editor über
+  **Bereitstellen → Bereitstellungen verwalten → Bearbeiten (Stift-Symbol) →
+  Version: Neu → Bereitstellen** eine neue Version veröffentlichen. Nur den
+  Code zu speichern reicht nicht – die laufende Web-App nutzt sonst weiter die
+  alte Version.
+
+### Ideen für später (noch nicht entschieden)
+
+- **Live-Leaderboard in der App** (z. B. unter dem Bingo-Grid, wer wie weit
+  ist): bewusst nicht umgesetzt, weil die Website bisher nur ans Sheet
+  schreibt, nie davon liest – dafür bräuchte es einen Cross-Domain-Lesezugriff
+  (CORS), was hier extra Komplexität und eine neue Fehlerquelle wäre.
+  Einfachster Weg, falls das später doch gewünscht ist: das Google Sheet (oder
+  nur die Bingo-Tabelle) über "Datei → Freigeben → Im Web veröffentlichen" als
+  öffentlich lesbares CSV/JSON freigeben, das auch Gäste sehen könnten, und
+  das per `fetch()` von der Website abrufen. Vorbehalt: das Sheet wäre dann
+  für jeden mit Link lesbar (kein Login), ähnlich wie das Party-Foto auf der
+  Startseite.
 
 ## Live-URL
 

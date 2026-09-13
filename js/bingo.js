@@ -373,8 +373,22 @@ function checkBingo() {
   if (ACTIVE_WIN_RULE(state.progress, state.cells)) {
     state.bingoAt = new Date().toISOString();
     saveState(state);
+    logBingoToSheet();
     celebrateBingoFirstTime();
   }
+}
+
+// Meldet einmalig (beim ersten Erreichen von "Bingo") Name + Fortschritt ans
+// zentrale Google Sheet (Tabelle "Bingo", siehe ../google-apps-script/Code.gs).
+// Fire-and-forget wie beim Songwunsch - kein Effekt auf die Gäste-Ansicht,
+// falls das fehlschlägt.
+function logBingoToSheet() {
+  const found = state.progress.filter((entry) => entry !== null).length;
+  sendToSheet({
+    type: "bingo",
+    playerName: state.playerName,
+    progress: `${found}/${state.cells.length}`,
+  });
 }
 
 // Zeigt einmalig eine große "BINGO!"-Einblendung in der Bildschirmmitte,

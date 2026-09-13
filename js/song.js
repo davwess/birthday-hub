@@ -3,11 +3,10 @@
 // ============================================================
 // Formular + Erfolgsmeldung, lokale Sicherungskopie UND zentrale Ablage
 // im Google Sheet über die Apps Script Web-App (siehe
-// ../google-apps-script/Code.gs, README für Details).
+// ../google-apps-script/Code.gs, README für Details). Die Sheet-Anbindung
+// selbst (SHEET_ENDPOINT_URL, sendToSheet()) liegt in js/guest.js, weil
+// bingo.js sie fürs Bingo-Log ebenfalls nutzt.
 // ============================================================
-
-const SHEET_ENDPOINT_URL =
-  "https://script.google.com/macros/s/AKfycbzD5PvFIM03gTXpLKSLCtSkD3tc_u1EE0kEnZoICtm__g8MNpF9Nc3Ur6Xv72CCDW5f/exec";
 
 const LOCAL_BACKUP_KEY = "birthdayHubSongWishes";
 
@@ -19,24 +18,6 @@ function saveWishLocally(wish) {
   } catch (e) {
     console.warn("Songwunsch konnte nicht lokal gesichert werden:", e);
   }
-}
-
-// Schickt den Wunsch ans Google Sheet, sobald SHEET_ENDPOINT_URL gesetzt ist.
-// Läuft bewusst "fire and forget": ein Netzwerkfehler oder eine fehlende
-// Internetverbindung darf die Nutzung nicht blockieren - die Erfolgsmeldung
-// erscheint in jedem Fall, die lokale Sicherungskopie bleibt zusätzlich
-// erhalten.
-function sendWishToSheet(wish) {
-  if (!SHEET_ENDPOINT_URL) return;
-
-  fetch(SHEET_ENDPOINT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(wish),
-  }).catch((e) => {
-    console.warn("Songwunsch konnte nicht ans Sheet gesendet werden (läuft trotzdem lokal weiter):", e);
-  });
 }
 
 function showSuccess() {
@@ -79,7 +60,7 @@ function init() {
     };
 
     saveWishLocally(wish);
-    sendWishToSheet(wish);
+    sendToSheet(wish);
 
     if (guestName) {
       setGuestName(guestName); // für Bingo & künftige Besuche synchron halten
