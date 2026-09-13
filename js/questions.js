@@ -1,73 +1,62 @@
 // ============================================================
-// TESTDATEN – Bingo-Aufgabenpool
+// Bingo-Aufgabenpool (finale Fragen aus "Fragenliste BINGO.xlsx")
 // ============================================================
-// Diese Datei wird VOR der Party komplett durch die finalen
-// Aufgaben aus dem gemeinsamen Google Sheet ersetzt (Phase 5/6).
-// Die Website braucht am Party-Abend keine Internetverbindung
-// zum Sheet – die Aufgaben stehen fest in dieser Datei.
+// 25 Aufgaben insgesamt. Jede hat ein "tag", das steuert, wie sie bei der
+// Kartengenerierung behandelt wird (siehe generateCard() in js/bingo.js):
 //
-// Struktur: 6 Kategorien x 3 Aufgaben = 18 Aufgaben insgesamt.
+// - tag "P"  (Pflicht):   landet garantiert auf jeder Karte.
+// - tag "S"  (Sonstige):  frei/zufällig - füllt die Karte bis 18 Felder auf.
+// - alles andere (z. B. "A1", "A2"): Alternativ-Gruppe. Der Buchstabe vor der
+//   Zahl ist der Gruppen-Schlüssel (A1/A2 -> Gruppe "A"). Pro Gruppe wird
+//   genau eine Aufgabe zufällig gezogen, nie mehrere aus derselben Gruppe.
+//
+// Aktuell: 11 Pflicht + 4 Alternativ-Gruppen (A/B/C/D) + 5 Sonstige, von
+// denen 3 zufällig gezogen werden -> 11 + 4 + 3 = 18 Felder pro Karte.
 //
 // Jede Aufgabe hat zwei Texte:
 // - shortLabel: kurzes Stichwort, erscheint auf der Karte selbst.
 // - text: die volle Aufgabe, erscheint erst beim Antippen.
 //
-// Wichtig für später:
-// - CATEGORY_ORDER legt die Reihenfolge der Kategorien auf der Seite fest.
-// - CATEGORY_QUOTAS legt fest, wie viele Aufgaben pro Kategorie auf die
-//   Karte kommen (aktuell 3 - also alle vorhandenen Aufgaben je Kategorie).
-//   Wird der Pool je Kategorie später größer als die Quote, bekommen
-//   unterschiedliche Gäste automatisch unterschiedlich zusammengestellte
-//   Aufgaben innerhalb der Kategorie.
+// "category" wird für die Fragen-Auswahl NICHT mehr verwendet (nur noch für
+// den kleinen farbigen Punkt auf der Kachel, siehe CATEGORY_COLORS in
+// js/bingo.js).
+//
+// Fragen deaktivieren: in der Excel eine Zeile mit "nein" in der
+// aktiv-Spalte markieren und diese Zeile hier mit aktiv:false übernehmen -
+// sie wird dann bei der Kartengenerierung ignoriert.
 // ============================================================
 
-const CATEGORY_ORDER = [
-  "Bennet",
-  "David",
-  "Bennet & David",
-  "Freunde & Vergangenheit",
-  "Reisen & Erlebnisse",
-  "Random / Party",
-];
+const CATEGORY_ORDER = ["Bennet & David", "Gäste", "Reisen", "Aktivität"];
 
+// "difficulty" (Schwierigkeit: "leicht"/"mittel"/"schwer") wird für die
+// Platzierung im Raster genutzt: die mittlere Reihe bekommt bevorzugt keine
+// "leicht"-Aufgaben, außer sie gehören zur Kategorie "Aktivität" (siehe
+// arrangeCells() in js/bingo.js). So gibt es keinen Weg zum "Bingo", der nur
+// aus leichten Aufgaben besteht.
 const QUESTION_POOL = [
-  // ---- Bennet ----
-  { id: "b1", category: "Bennet", shortLabel: "Kennt Bennets Lieblingsgetränk", text: "Finde jemanden, der/die Bennets Lieblingsgetränk kennt" },
-  { id: "b2", category: "Bennet", shortLabel: "Reiste mit Bennet", text: "Finde jemanden, der/die schon mal mit Bennet gereist ist" },
-  { id: "b3", category: "Bennet", shortLabel: "Kennt Bennet von der Arbeit", text: "Finde jemanden, der/die Bennet von der Arbeit kennt" },
-
-  // ---- David ----
-  { id: "d1", category: "David", shortLabel: "Kennt Davids Lieblingsserie", text: "Finde jemanden, der/die Davids Lieblingsserie kennt" },
-  { id: "d2", category: "David", shortLabel: "Übernachtete bei David", text: "Finde jemanden, der/die schon mal bei David übernachtet hat" },
-  { id: "d3", category: "David", shortLabel: "Kennt David vom Studium", text: "Finde jemanden, der/die David vom Studium kennt" },
-
-  // ---- Bennet & David ----
-  { id: "bd1", category: "Bennet & David", shortLabel: "Weiß, wie sie sich kennenlernten", text: "Finde jemanden, der/die weiß, wie sich Bennet und David kennengelernt haben" },
-  { id: "bd2", category: "Bennet & David", shortLabel: "War mit beiden im Urlaub", text: "Finde jemanden, der/die schon mal mit beiden im Urlaub war" },
-  { id: "bd3", category: "Bennet & David", shortLabel: "Hat gemeinsames Foto (5 Jahre)", text: "Finde jemanden, der/die ein gemeinsames Foto von beiden aus den letzten 5 Jahren hat" },
-
-  // ---- Freunde & Vergangenheit ----
-  { id: "fv1", category: "Freunde & Vergangenheit", shortLabel: "Kennt uns seit 10+ Jahren", text: "Finde jemanden, der/die Bennet oder David schon länger als 10 Jahre kennt" },
-  { id: "fv2", category: "Freunde & Vergangenheit", shortLabel: "Ging mit uns zur Schule", text: "Finde jemanden, der/die mit einem von beiden zur Schule gegangen ist" },
-  { id: "fv3", category: "Freunde & Vergangenheit", shortLabel: "Zum 1. Mal dabei", text: "Finde jemanden, der/die heute zum ersten Mal dabei ist" },
-
-  // ---- Reisen & Erlebnisse ----
-  { id: "re1", category: "Reisen & Erlebnisse", shortLabel: "10+ Länder bereist", text: "Finde jemanden, der/die schon in mehr als 10 Ländern war" },
-  { id: "re2", category: "Reisen & Erlebnisse", shortLabel: "Flug verpasst", text: "Finde jemanden, der/die schon mal einen Flug verpasst hat" },
-  { id: "re3", category: "Reisen & Erlebnisse", shortLabel: "Urlaub diesen Sommer", text: "Finde jemanden, der/die diesen Sommer im Urlaub war" },
-
-  // ---- Random / Party ----
-  { id: "rp1", category: "Random / Party", shortLabel: "Bis Sonnenaufgang gefeiert", text: "Finde jemanden, der/die schon mal bis Sonnenaufgang gefeiert hat" },
-  { id: "rp2", category: "Random / Party", shortLabel: "Spielt ein Instrument", text: "Finde jemanden, der/die ein Instrument spielt" },
-  { id: "rp3", category: "Random / Party", shortLabel: "Kann Zunge rollen", text: "Finde jemanden, der/die die Zunge rollen kann" },
+  { id: 1, category: "Bennet & David", tag: "A1", difficulty: "mittel", aktiv: true, shortLabel: "Mit Bennet oder David studiert", text: "Finde jemanden, der/die schon mal mit Bennet oder David studiert hat." },
+  { id: 2, category: "Bennet & David", tag: "A2", difficulty: "schwer", aktiv: true, shortLabel: "Mit Bennet oder David zusammengearbeitet", text: "Finde jemanden, der/die schon mal mit Bennet oder David zusammengearbeitet hat." },
+  { id: 3, category: "Bennet & David", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Mit Bennet oder David in einem Club / Verein", text: "Finde jemanden, der/die mit Bennet oder David in einem Club oder Verein ist/war." },
+  { id: 4, category: "Bennet & David", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Mit Bennet oder David im Skiurlaub gewesen", text: "Finde jemanden, der/die schon mal mit Bennet oder David im Skiurlaub war." },
+  { id: 5, category: "Bennet & David", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Bennet oder David schon mal nackt gesehen", text: "Finde jemanden, der/die Bennet oder David schon mal nackt gesehen hat." },
+  { id: 6, category: "Bennet & David", tag: "S", difficulty: "leicht", aktiv: true, shortLabel: "Größer als Bennet und David", text: "Finde jemanden, der/die größer ist als Bennet und David." },
+  { id: 7, category: "Bennet & David", tag: "B1", difficulty: "leicht", aktiv: true, shortLabel: "Kennt Bennet oder David über 15 Jahre", text: "Finde jemanden, der/die Bennet oder David schon länger als 15 Jahre kennt." },
+  { id: 8, category: "Bennet & David", tag: "B2", difficulty: "schwer", aktiv: true, shortLabel: "Kennt Bennet oder David weniger als 2 Jahre", text: "Finde jemanden, der/die Bennet oder David seit weniger als 2 Jahren kennt." },
+  { id: 9, category: "Bennet & David", tag: "S", difficulty: "leicht", aktiv: true, shortLabel: "Mit Bennet oder David in einem Zelt geschlafen", text: "Finde jemanden, der/die schon mal mit Bennet oder David in einem Zelt geschlafen hat." },
+  { id: 10, category: "Bennet & David", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Mit Bennet oder David zwischen 6-9 Uhr morgens getrunken", text: "Finde jemanden, der/die schon mal mit Bennet oder David zwischen 6 und 9 Uhr morgens getrunken hat." },
+  { id: 11, category: "Gäste", tag: "S", difficulty: "mittel", aktiv: true, shortLabel: "Wohnt in Berlin", text: "Finde jemanden, der/die in Berlin wohnt." },
+  { id: 12, category: "Gäste", tag: "P", difficulty: "schwer", aktiv: true, shortLabel: "Spricht eine weitere Fremdsprache neben Englisch", text: "Finde jemanden, der/die neben Englisch noch eine weitere Fremdsprache spricht." },
+  { id: 13, category: "Gäste", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Hat oder macht einen Doktor", text: "Finde jemanden, der/die einen Doktortitel hat oder gerade macht." },
+  { id: 14, category: "Gäste", tag: "C1", difficulty: "mittel", aktiv: true, shortLabel: "Ist oder war Unternehmensberater", text: "Finde jemanden, der/die Unternehmensberater(in) ist oder war." },
+  { id: 15, category: "Gäste", tag: "C2", difficulty: "schwer", aktiv: true, shortLabel: "Ist selbstständig", text: "Finde jemanden, der/die selbstständig ist." },
+  { id: 16, category: "Gäste", tag: "C3", difficulty: "mittel", aktiv: true, shortLabel: "Ist oder wird Lehrer", text: "Finde jemanden, der/die Lehrer(in) ist oder wird." },
+  { id: 17, category: "Gäste", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Person die ich heute erst kennengelernt habe", text: "Finde jemanden, den/die du heute zum ersten Mal triffst." },
+  { id: 18, category: "Gäste", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Hat schon mal mehr als 5 Monate im Ausland gelebt", text: "Finde jemanden, der/die schon mal mehr als 5 Monate im Ausland gelebt hat." },
+  { id: 19, category: "Gäste", tag: "S", difficulty: "mittel", aktiv: true, shortLabel: "Hat einen Halbmarathon (erfolgreich) beendet", text: "Finde jemanden, der/die schon mal erfolgreich einen Halbmarathon beendet hat." },
+  { id: 20, category: "Reisen", tag: "D1", difficulty: "schwer", aktiv: true, shortLabel: "War in Südamerika", text: "Finde jemanden, der/die schon mal in Südamerika war." },
+  { id: 21, category: "Reisen", tag: "D2", difficulty: "schwer", aktiv: true, shortLabel: "War in mehr als 20 Ländern", text: "Finde jemanden, der/die schon mal in mehr als 20 Ländern war." },
+  { id: 22, category: "Reisen", tag: "S", difficulty: "mittel", aktiv: true, shortLabel: "Hat einen BahnBonus Status von Silber oder höher", text: "Finde jemanden, der/die einen BahnBonus-Status von Silber oder höher hat." },
+  { id: 23, category: "Reisen", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "War dieses Jahr außerhalb von Europa", text: "Finde jemanden, der/die dieses Jahr schon außerhalb von Europa war." },
+  { id: 24, category: "Aktivität", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Hat gerade einen Drink mit mir geext", text: "Finde jemanden, der/die gerade einen Drink mit dir geext hat." },
+  { id: 25, category: "Aktivität", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Hat mit mir ein Foto gemacht und hochgeladen", text: "Finde jemanden, der/die dir gerade ein Foto gemacht und hochgeladen hat." },
 ];
-
-// Wie viele Aufgaben jede Kategorie auf einer Karte beisteuert.
-const CATEGORY_QUOTAS = {
-  "Bennet": 3,
-  "David": 3,
-  "Bennet & David": 3,
-  "Freunde & Vergangenheit": 3,
-  "Reisen & Erlebnisse": 3,
-  "Random / Party": 3,
-};

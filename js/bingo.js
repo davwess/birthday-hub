@@ -1,7 +1,7 @@
 // ============================================================
 // Bingo-Logik
-// Benötigt CATEGORY_ORDER, QUESTION_POOL und CATEGORY_QUOTAS aus
-// js/questions.js (in bingo.html VOR dieser Datei eingebunden).
+// Benötigt CATEGORY_ORDER und QUESTION_POOL aus js/questions.js
+// (in bingo.html VOR dieser Datei eingebunden).
 // ============================================================
 
 const STORAGE_KEY = "birthdayHubBingoState";
@@ -10,7 +10,7 @@ const STORAGE_KEY = "birthdayHubBingoState";
 // oder Zuschnitt der Aufgaben). Alte Spielstände mit anderer SCHEMA_VERSION
 // werden dann automatisch verworfen und neu generiert, statt kaputt
 // anzuzeigen.
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 // ---------- Speichern / Laden (localStorage) ----------
 
@@ -54,17 +54,86 @@ function shuffle(list) {
   return copy;
 }
 
-// Zieht pro Kategorie die passende Anzahl Aufgaben (siehe CATEGORY_QUOTAS)
-// zufällig aus dem Pool. Reihenfolge innerhalb einer Kategorie wird gemischt;
-// die Kategorien selbst bleiben in CATEGORY_ORDER (fürs Layout).
+// Zielgröße der Karte (muss zum CSS-Grid passen: BINGO_COLUMNS x Zeilen).
+const TOTAL_CELLS = 18;
+
+// Baut eine Karte nach dem Pflicht/Alternativ/Sonstige-Schema aus
+// js/questions.js:
+// - tag "P": immer dabei.
+// - tag "S": Rest-Pool, wird zufällig aufgefüllt bis TOTAL_CELLS erreicht ist.
+// - alles andere (z. B. "A1"/"A2"): Alternativ-Gruppe (Gruppen-Schlüssel =
+//   Buchstabe vor der Zahl). Pro Gruppe wird genau eine Aufgabe gezogen.
+// Am Ende wird die Reihenfolge der ausgewählten Aufgaben gemischt, damit
+// nicht jede Karte optisch gleich aussieht (die meisten Inhalte - die
+// Pflicht-Aufgaben - sind ja ohnehin bei jedem Gast identisch).
 function generateCard() {
-  let picked = [];
-  CATEGORY_ORDER.forEach((category) => {
-    const quota = CATEGORY_QUOTAS[category] || 0;
-    const poolForCategory = QUESTION_POOL.filter((q) => q.category === category);
-    picked = picked.concat(shuffle(poolForCategory).slice(0, quota));
+  const active = QUESTION_POOL.filter((q) => q.aktiv !== false);
+
+  const mandatory = active.filter((q) => q.tag === "P");
+  const sonstige = active.filter((q) => q.tag === "S");
+  const groupPool = active.filter((q) => q.tag !== "P" && q.tag !== "S");
+
+  const groups = {};
+  groupPool.forEach((q) => {
+    const groupKey = q.tag.replace(/\d+$/, "");
+    if (!groups[groupKey]) groups[groupKey] = [];
+    groups[groupKey].push(q);
   });
-  return picked;
+
+  const oneFromEachGroup = Object.keys(groups).map((key) => shuffle(groups[key])[0]);
+
+  const freeSlots = Math.max(0, TOTAL_CELLS - mandatory.length - oneFromEachGroup.length);
+  const fillers = shuffle(sonstige).slice(0, freeSlots);
+
+  const picked = mandatory.concat(oneFromEachGroup, fillers);
+  return arrangeCells(picked);
+}
+
+// Ordnet die ausgewählten Aufgaben auf dem Raster an. Die mittlere Reihe
+// (siehe MIDDLE_ROW_INDEX) bekommt bevorzugt "Aktivität"-Aufgaben und sonst
+// nur "nicht leicht"-Aufgaben - nie eine "leicht"-Aufgabe aus einer anderen
+// Kategorie. So kann es nie einen Bingo-Pfad geben, der nur aus leichten
+// Aufgaben besteht: jeder Pfad muss durch die mittlere Reihe, und die ist
+// nie komplett "leicht". Alle anderen Felder werden normal gemischt.
+function arrangeCells(selected) {
+  const rows = Math.ceil(selected.length / BINGO_COLUMNS);
+  const middleRowIndex = Math.floor((rows - 1) / 2);
+  const middleStart = middleRowIndex * BINGO_COLUMNS;
+  const middleCount = Math.min(BINGO_COLUMNS, Math.max(0, selected.length - middleStart));
+
+  const aktivitaet = shuffle(selected.filter((q) => q.category === "Aktivität"));
+  const nonLeicht = shuffle(
+    selected.filter((q) => q.category !== "Aktivität" && q.difficulty !== "leicht")
+  );
+  const rest = shuffle(
+    selected.filter((q) => q.category !== "Aktivität" && q.difficulty === "leicht")
+  );
+
+  // Mittlere Reihe zuerst mit Aktivität-Aufgaben füllen, dann mit anderen
+  // "nicht leicht"-Aufgaben auffüllen. Reicht das immer noch nicht (sollte
+  // mit dem aktuellen Fragenpool nicht vorkommen), als letzter Fallback auch
+  // "leicht"-Aufgaben zulassen, damit die Karte nie kaputtgeht.
+  const middlePicks = aktivitaet.splice(0, middleCount);
+  while (middlePicks.length < middleCount && nonLeicht.length > 0) {
+    middlePicks.push(nonLeicht.shift());
+  }
+  while (middlePicks.length < middleCount && rest.length > 0) {
+    middlePicks.push(rest.shift());
+  }
+
+  const remaining = shuffle(aktivitaet.concat(nonLeicht, rest));
+
+  const result = new Array(selected.length);
+  let remainingIndex = 0;
+  let middleIndex = 0;
+  for (let i = 0; i < selected.length; i++) {
+    if (i >= middleStart && i < middleStart + middleCount) {
+      result[i] = middlePicks[middleIndex++];
+    } else {
+      result[i] = remaining[remainingIndex++];
+    }
+  }
+  return result;
 }
 
 function createNewState(playerName) {
@@ -170,12 +239,10 @@ const ACTIVE_WIN_RULE = WIN_RULES.pathBingo;
 // ---------- Kategorie-Farben (nur Optik, keine sichtbaren Kategorie-Namen) ----------
 
 const CATEGORY_COLORS = {
-  "Bennet": "#7fb8d6",
-  "David": "#c98fd1",
   "Bennet & David": "#e28b9c",
-  "Freunde & Vergangenheit": "#9fcf8f",
-  "Reisen & Erlebnisse": "#e0a86a",
-  "Random / Party": "#6bc8c2",
+  "Gäste": "#7fb8d6",
+  "Reisen": "#e0a86a",
+  "Aktivität": "#6bc8c2",
 };
 
 // ---------- Rendering ----------
@@ -196,10 +263,10 @@ function renderTopbar() {
 }
 
 // Baut die 18 Aufgaben als flaches 3x6-Kachel-Raster auf, in der Reihenfolge
-// von state.cells (nach Kategorie gruppiert generiert, siehe generateCard).
-// Die Kategorie-Namen selbst werden dem Gast bewusst NICHT angezeigt - nur
-// der farbige Punkt pro Kachel deutet die Gruppierung dezent an (siehe
-// README).
+// von state.cells (Pflicht/Alternativ/Sonstige gemischt, siehe generateCard
+// und arrangeCells). Die Kategorie-Namen selbst werden dem Gast bewusst NICHT
+// angezeigt - nur der farbige Punkt pro Kachel deutet die Gruppierung dezent
+// an (siehe README).
 function renderGrid() {
   const grid = document.getElementById("bingo-grid");
   grid.innerHTML = "";

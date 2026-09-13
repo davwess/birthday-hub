@@ -13,7 +13,7 @@ birthday-hub/
 ├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
 ├── js/app.js          # Logik Startseite (Namens-Prompt)
 ├── js/guest.js         # Gemeinsamer Gast-Name (geteilt zwischen Startseite/Bingo/Songwunsch)
-├── js/questions.js    # Bingo-Aufgabenpool + Kategorien + Quoten (TESTDATEN)
+├── js/questions.js    # Bingo-Aufgabenpool (25 finale Fragen aus Fragenliste BINGO.xlsx)
 ├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo-Regel)
 ├── js/song.js          # Songwunsch-Formular-Logik
 └── assets/             # Bilder etc.
@@ -27,8 +27,10 @@ birthday-hub/
 - Phase 4: Bingo-Grundfunktion ✅
 - Phase 5: Bingo-Regeln verfeinert (Path Bingo) ✅
 - Phase 6a: Songwunsch-Formular (Frontend) ✅
-- Phase 6b: Songwunsch → Google Sheet Anbindung – offen
-- Phase 7+: Zentrale Bingo-Synchronisierung, Fotos-Link – offen
+- Phase 6b: Songwunsch → Google Sheet + Host-Dashboard ✅
+- Bingo-Fragenpool: finale 25 Fragen aus `Fragenliste BINGO.xlsx` ✅
+- Phase 7: Zentrale Bingo-Synchronisierung – offen
+- Phase 8: Fotos-Link, Design-Politur, Gesamttest – offen
 
 ## Startseiten-Foto
 
@@ -48,19 +50,34 @@ birthday-hub/
 
 ## Bingo – wie es funktioniert
 
-- **Struktur:** 6 Kategorien × 3 Aufgaben = 18 Aufgaben insgesamt (`CATEGORY_ORDER`,
-  `QUESTION_POOL`, `CATEGORY_QUOTAS` in `js/questions.js`). Aktuelle Platzhalter-
-  Kategorien: Bennet, David, Bennet & David, Freunde & Vergangenheit,
-  Reisen & Erlebnisse, Random / Party.
-- **Kategorien werden den Gästen bewusst nicht angezeigt** (kein Name, kein
-  Fortschritt pro Kategorie) – sie dienen nur intern der Gruppierung, den
-  farbigen Punkten auf den Karten und der Gewinnlogik. Sichtbar ist nur der
+- **Fragenquelle:** `js/questions.js` enthält die 25 finalen Fragen aus
+  `Fragenliste BINGO.xlsx` (Spalten ID/Kategorie/Frage kurz/Frage lang/
+  Schwierigkeit/Auswahltag/aktiv). Jede Frage hat dort ein `tag`-Feld, das
+  bestimmt, wie sie in `generateCard()` (`js/bingo.js`) behandelt wird:
+  - **`"P"` (Pflicht, 11 Fragen):** landet garantiert auf jeder Karte.
+  - **`"S"` (Sonstige, 5 Fragen):** freier Pool, davon werden zufällig so
+    viele gezogen, wie noch bis 18 Felder fehlen (aktuell 3 von 5).
+  - **Buchstabe+Zahl wie `"A1"`/`"A2"` (Alternativ-Gruppen, aktuell A/B/C/D):**
+    Fragen mit demselben Buchstaben sind Alternativen zueinander – pro Gruppe
+    wird genau eine zufällig gezogen, nie mehrere aus derselben Gruppe.
+  - Rechnung: 11 Pflicht + 4 Alternativ-Gruppen + 3 Sonstige = 18 Felder.
+  - Eine Frage per `aktiv: false` in `js/questions.js` ausschließen, ohne sie
+    zu löschen (entspricht "nein" in der aktiv-Spalte der Excel).
+- **Platzierung im Raster:** Die mittlere Reihe (bei 3×6 aktuell Reihe 3 von
+  6) bekommt bevorzugt die beiden "Aktivität"-Fragen; reicht das nicht, füllt
+  `arrangeCells()` mit anderen "nicht leicht"-Fragen auf. Eine "leicht"
+  eingestufte Frage aus einer anderen Kategorie kommt nie in die mittlere
+  Reihe. Da jeder Path-Bingo-Pfad zwingend durch diese Reihe muss, kann es
+  nie einen Gewinn-Pfad geben, der nur aus leichten Aufgaben besteht. Alle
+  übrigen Felder werden normal gemischt – dadurch sieht jede Karte trotz der
+  vielen identischen Pflicht-Fragen anders aus.
+- **Kategorien** (Bennet & David, Gäste, Reisen, Aktivität) werden den
+  Gästen bewusst nicht angezeigt und fließen nicht mehr in die Auswahl-Logik
+  ein – nur der farbige Punkt auf der Kachel (`CATEGORY_COLORS`) und die
+  Aktivität-Sonderregel oben nutzen sie noch. Sichtbar ist nur der
   Gesamtfortschritt oben rechts (z. B. „7/18“).
 - Beim ersten Öffnen von `bingo.html` wird nach dem Namen gefragt, danach werden
-  die 18 Aufgaben als Kachel-Raster mit 3 Spalten × 6 Reihen angezeigt (statt der
-  früheren 5×5-Kacheln) – dadurch sind die einzelnen Kacheln größer und besser
-  lesbar. Die Reihenfolge der Kacheln folgt intern der Kategorie-Gruppierung,
-  sichtbar ist das aber nicht.
+  die 18 Aufgaben als Kachel-Raster mit 3 Spalten × 6 Reihen angezeigt.
 - Antippen einer Kachel öffnet „Wen hast du gefunden?“. Ist die Aufgabe schon
   erledigt, bleibt der kurze Aufgabentext weiterhin sichtbar (klein, unter dem
   Haken), zusätzlich zum eingetragenen Namen – nicht nur ein Häkchen.
@@ -89,12 +106,8 @@ birthday-hub/
   Bildschirmmitte (ca. 2,2 Sek.), danach bleibt dauerhaft ein kleines Badge
   unten sichtbar ("🎉 Bingo erreicht") – auch nach einem Reload, solange
   `state.bingoAt` gesetzt ist. Die große Einblendung erscheint nur einmal.
-- **Vor der Party:** `js/questions.js` mit den finalen Aufgaben aus dem gemeinsamen
-  Google Sheet ersetzen (Phase 5/6). Die Website braucht danach keine Internet-
-  verbindung zum Sheet mehr.
 - Jede Aufgabe hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
-  einen `text` (volle Aufgabe, erscheint erst beim Antippen). Der finale
-  Aufgabenpool aus dem Sheet sollte beides enthalten.
+  einen `text` (volle Aufgabe, erscheint erst beim Antippen).
 - `js/bingo.js` hat oben eine `SCHEMA_VERSION`-Konstante. Falls sich der Aufbau des
   gespeicherten Spielstands mal ändert (neues Feld, andere Aufgabenanzahl o. Ä.),
   diese Zahl um 1 erhöhen – alte, nicht mehr passende Spielstände werden dann
