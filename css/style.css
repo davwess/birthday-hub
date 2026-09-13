@@ -194,6 +194,10 @@ a {
   margin-bottom: 6px;
 }
 
+.subpage-content .overlay__button.button-block {
+  margin: 10px 0;
+}
+
 .subpage-content h2 {
   font-size: 1.4rem;
   margin: 0;
