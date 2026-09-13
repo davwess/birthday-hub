@@ -516,6 +516,7 @@ a {
 
 .overlay__button {
   flex: 1;
+  display: inline-block;
   padding: 14px;
   border-radius: 12px;
   border: none;
@@ -523,6 +524,8 @@ a {
   color: #14110a;
   font-weight: 600;
   font-size: 0.95rem;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
 }
 

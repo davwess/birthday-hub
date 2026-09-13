@@ -8,7 +8,7 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 birthday-hub/
 ├── index.html        # Startseite mit Foto-Kachel, 3 Kacheln + einmaligem Namens-Prompt
 ├── bingo.html         # Bingo (Path Bingo, fertig)
-├── fotos.html         # Platzhalter (Phase 8: externer Foto-Link)
+├── fotos.html         # Foto-Link zu Knipsmig (Phase 8)
 ├── song.html          # Songwunsch-Formular (Frontend + Sheet-Anbindung fertig)
 ├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
 ├── js/app.js          # Logik Startseite (Namens-Prompt)
@@ -30,7 +30,7 @@ birthday-hub/
 - Phase 6b: Songwunsch → Google Sheet + Host-Dashboard ✅
 - Bingo-Fragenpool: finale 25 Fragen aus `Fragenliste BINGO.xlsx` ✅
 - Phase 7: Zentrale Bingo-Synchronisierung (Bingo-Log im Google Sheet) ✅
-- Phase 8: Fotos-Link, Design-Politur, Gesamttest – offen
+- Phase 8: Fotos-Link (Knipsmig) ✅ – Design-Politur & Gesamttest offen
 
 ## Startseiten-Foto
 
@@ -47,6 +47,21 @@ birthday-hub/
   Foto auf ca. 1000 px Breite im Seitenverhältnis 12:5 zuschneiden (Motiv oben,
   unteres Drittel eher ruhig/einfarbig lassen wegen des Textes), als
   `assets/hero.jpg` speichern und die `?v=`-Nummer hochzählen (siehe unten).
+
+## Fotos – wie es funktioniert
+
+- `fotos.html` verlinkt direkt auf unser Event bei **Knipsmig**
+  (`https://knipsmig.com/9gn0EQ0L`) – ein Klick auf "Fotos hochladen" öffnet
+  die Knipsmig-Foto-Seite in einem neuen Tab, kein App-Download, kein Login
+  nötig.
+- Der Link ist fest im HTML eingetragen (kein eigenes Backend nötig, anders
+  als bei Bingo/Songwunsch). Soll sich der Link mal ändern (z. B. neues
+  Event angelegt): in `fotos.html` das `href` beim "Fotos hochladen"-Button
+  anpassen und die `?v=`-Nummer hochzählen.
+- Bewusst gegen POV entschieden: Knipsmig ist komplett kostenlos und ohne
+  Gästelimit/Foto-Obergrenze pro Person, was für eine Bar-Party mit vielen
+  Gästen über die ganze Nacht praktischer ist als POVs Preisstaffelung ab
+  10 Gästen und festem Foto-Kontingent pro Gast.
 
 ## Bingo – wie es funktioniert
 
