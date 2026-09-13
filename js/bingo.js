@@ -451,6 +451,13 @@ function init() {
   document.getElementById("cell-overlay-save").addEventListener("click", handleCellSave);
   document.getElementById("cell-overlay-delete").addEventListener("click", handleCellDelete);
   document.getElementById("cell-overlay-cancel").addEventListener("click", closeCellOverlay);
+
+  document.getElementById("rules-open-button").addEventListener("click", () => {
+    document.getElementById("rules-overlay").classList.add("overlay--visible");
+  });
+  document.getElementById("rules-close-button").addEventListener("click", () => {
+    document.getElementById("rules-overlay").classList.remove("overlay--visible");
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

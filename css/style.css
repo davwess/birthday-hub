@@ -327,6 +327,35 @@ a {
   font-weight: 600;
 }
 
+.rules-link {
+  margin: 14px auto 0;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rules-list {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.rules-list li {
+  margin-bottom: 10px;
+}
+
+.rules-list li:last-child {
+  margin-bottom: 0;
+}
+
 .bingo-grid {
   flex: 1;
   display: grid;
