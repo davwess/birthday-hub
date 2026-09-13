@@ -57,6 +57,6 @@ const QUESTION_POOL = [
   { id: 21, category: "Reisen", tag: "D2", difficulty: "schwer", aktiv: true, shortLabel: "War in mehr als 20 Ländern", text: "Finde jemanden, der/die schon mal in mehr als 20 Ländern war." },
   { id: 22, category: "Reisen", tag: "S", difficulty: "mittel", aktiv: true, shortLabel: "Hat BahnBonus Status Silber oder höher", text: "Finde jemanden, der/die einen BahnBonus-Status von Silber oder höher hat." },
   { id: 23, category: "Reisen", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "War dieses Jahr außerhalb von Europa", text: "Finde jemanden, der/die dieses Jahr schon außerhalb von Europa war." },
-  { id: 24, category: "Aktivität", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Hat gerade Drink mit mir geext", text: "Finde jemanden, der/die gerade einen Drink mit dir geext hat." },
-  { id: 25, category: "Aktivität", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Haben ein Foto in POV gemacht", text: "Finde jemanden, der/die dir gerade ein Foto gemacht und hochgeladen hat." },
+  { id: 24, category: "Aktivität", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Drink mit mir gerade geext", text: "Finde jemanden, der/die gerade einen Drink mit dir geext hat." },
+  { id: 25, category: "Aktivität", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Gemeinsames Foto gemacht", text: "Finde jemanden, der/die mit dir gemeinsam ein Foto macht und in unser App-Album hochlädt." },
 ];
