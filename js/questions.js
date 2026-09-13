@@ -36,7 +36,7 @@ const CATEGORY_ORDER = ["Bennet & David", "Gäste", "Reisen", "Aktivität"];
 const QUESTION_POOL = [
   { id: 1, category: "Bennet & David", tag: "A1", difficulty: "mittel", aktiv: true, shortLabel: "Mit Bennet / David studiert", text: "Finde jemanden, der/die schon mal mit Bennet oder David studiert hat." },
   { id: 2, category: "Bennet & David", tag: "A2", difficulty: "schwer", aktiv: true, shortLabel: "Mit Bennet / David gearbeiteit", text: "Finde jemanden, der/die schon mal mit Bennet oder David zusammengearbeitet hat." },
-  { id: 3, category: "Bennet & David", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Mit Bennet / David in Club / Verein", text: "Finde jemanden, der/die mit Bennet oder David in einem Club oder Verein ist/war." },
+  { id: 3, category: "Bennet & David", tag: "P", difficulty: "leicht", aktiv: true, shortLabel: "Mit Bennet / David in Club oder Verein", text: "Finde jemanden, der/die mit Bennet oder David in einem Club oder Verein ist/war." },
   { id: 4, category: "Bennet & David", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Mit Bennet / David im Skiurlaub gewesen", text: "Finde jemanden, der/die schon mal mit Bennet oder David im Skiurlaub war." },
   { id: 5, category: "Bennet & David", tag: "P", difficulty: "mittel", aktiv: true, shortLabel: "Hat Bennet / David schon nackt gesehen", text: "Finde jemanden, der/die Bennet oder David schon mal nackt gesehen hat." },
   { id: 6, category: "Bennet & David", tag: "S", difficulty: "leicht", aktiv: true, shortLabel: "Größer als Bennet & David", text: "Finde jemanden, der/die größer ist als Bennet und David." },
