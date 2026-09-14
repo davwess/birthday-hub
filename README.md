@@ -7,14 +7,14 @@ Kleine mobile Website für die Geburtstagsparty am 19.09.2026, Deja Vú Bar, Ham
 ```
 birthday-hub/
 ├── index.html        # Startseite mit Foto-Kachel, 3 Kacheln + einmaligem Namens-Prompt
-├── bingo.html         # Bingo (Path Bingo, fertig)
+├── bingo.html         # Bingo (Path Bingo + Zeilen-Minimum, fertig)
 ├── fotos.html         # Foto-Link zu Knipsmig (Phase 8)
 ├── song.html          # Songwunsch-Formular (Frontend + Sheet-Anbindung fertig)
 ├── css/style.css      # Styles (Bingo-Grid, Songformular, Overlays)
 ├── js/app.js          # Logik Startseite (Namens-Prompt)
 ├── js/guest.js         # Gemeinsamer Gast-Name + Sheet-Anbindung (geteilt: Startseite/Bingo/Songwunsch)
 ├── js/questions.js    # Bingo-Aufgabenpool (25 finale Fragen aus Fragenliste BINGO.xlsx)
-├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo-Regel)
+├── js/bingo.js         # Bingo-Logik (Karten, Speicherung, Path-Bingo + Zeilen-Minimum)
 ├── js/song.js          # Songwunsch-Formular-Logik
 └── assets/             # Bilder etc.
 ```
@@ -100,23 +100,32 @@ birthday-hub/
   kategorieübergreifend, nicht nur innerhalb einer Kategorie.
 - Alles wird in `localStorage` gespeichert – ein Neuladen oder Schließen der Seite
   löscht den Fortschritt nicht.
-- **Gewinnregel: „Path Bingo"** (`ACTIVE_WIN_RULE` in `js/bingo.js`, aktuell
-  `WIN_RULES.pathBingo`): „Bingo“, sobald es einen durchgehend verbundenen Pfad
-  aus erledigten Kacheln von der obersten bis zur untersten Reihe gibt. Ein
-  erledigtes Feld darf sich dabei mit einem erledigten Feld in der Reihe
-  darunter verbinden, das direkt darunter, diagonal links darunter oder
-  diagonal rechts darunter liegt (nicht mit einem, das zwei Spalten
-  daneben liegt). Es reicht, wenn irgendein gültiger Pfad existiert – der
-  Gast muss dafür nicht gezielt an einem laufenden Pfad weiterarbeiten,
-  jede Aufgabe bleibt jederzeit anklickbar. Nach dem ersten „Bingo“ gibt es
-  keine Sperre; es kann normal weitergespielt werden bis 18/18.
-  Die Pfadprüfung (`hasVerticalPath`) ist nicht auf 6 Reihen fest verdrahtet,
-  sondern berechnet die Zeilenzahl aus der Aufgabenanzahl und der
-  Spaltenzahl (`BINGO_COLUMNS`, muss zum CSS-Grid passen) – funktioniert
-  also automatisch weiter, falls später mehr/weniger Reihen dazukommen.
-  Alternative Regeln (`categoryThreshold`, `complete`) sind weiterhin in
-  `WIN_RULES` vorhanden und lassen sich per Zuweisung an `ACTIVE_WIN_RULE`
-  jederzeit reaktivieren.
+- **Gewinnregel: „Path Bingo + Zeilen-Minimum"** (`ACTIVE_WIN_RULE` in
+  `js/bingo.js`, aktuell `WIN_RULES.pathBingoRowMin`): „Bingo“, sobald
+  **jede** der 6 Reihen mindestens 2 der 3 Felder ausgefüllt hat (mind.
+  12 von 18 Feldern insgesamt) **und** es weiterhin einen durchgehend
+  verbundenen Pfad aus erledigten Kacheln von der obersten bis zur
+  untersten Reihe gibt (`hasVerticalPath`, ein Feld darf sich mit einem
+  erledigten Feld direkt darunter oder diagonal links/rechts darunter
+  verbinden). Rechnerisch geprüft (alle 4096 möglichen Belegungen mit
+  ≥2/3 pro Reihe durchgespielt): bei 3 Spalten erfüllt jede Belegung, die
+  das Zeilen-Minimum schafft, automatisch auch die Pfad-Bedingung – die
+  Pfadprüfung ist also aktuell redundant, bleibt aber bewusst als
+  `&&`-Bedingung im Code, falls sich `BINGO_COLUMNS` mal ändert (dann
+  wäre sie wieder eine echte Zusatzbedingung). Es reicht, wenn die
+  Bedingung irgendwann erfüllt ist – die Gäste müssen nicht gezielt auf
+  einen Pfad hinarbeiten, jede Aufgabe bleibt jederzeit anklickbar in
+  beliebiger Reihenfolge. Nach dem ersten „Bingo“ gibt es keine Sperre;
+  es kann normal weitergespielt werden bis 18/18.
+  Beide Prüfungen (`hasVerticalPath`, `hasMinFilledPerRow`) sind nicht auf
+  6 Reihen fest verdrahtet, sondern berechnen die Zeilenzahl aus der
+  Aufgabenanzahl und der Spaltenzahl (`BINGO_COLUMNS`, muss zum CSS-Grid
+  passen) – funktionieren also automatisch weiter, falls später mehr/
+  weniger Reihen dazukommen. Die Mindestanzahl pro Reihe steht in
+  `ROW_MIN_FILLED` (aktuell 2). Alternative Regeln (`pathBingo` – nur der
+  Pfad, ohne Zeilen-Minimum –, `categoryThreshold`, `complete`) sind
+  weiterhin in `WIN_RULES` vorhanden und lassen sich per Zuweisung an
+  `ACTIVE_WIN_RULE` jederzeit reaktivieren.
 - **Bingo-Feier:** Beim Erreichen erscheint einmalig groß "🎉 BINGO!" in der
   Bildschirmmitte (ca. 2,2 Sek.), danach bleibt dauerhaft ein kleines Badge
   unten sichtbar ("🎉 Bingo erreicht") – auch nach einem Reload, solange

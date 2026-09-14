@@ -220,10 +220,36 @@ function hasVerticalPath(progress, columns) {
   return reachableInPreviousRow.some(Boolean);
 }
 
+// Mindestanzahl erledigter Felder, die JEDE Reihe haben muss, damit
+// "pathBingoRowMin" zusätzlich zum Pfad "Bingo" auslöst.
+const ROW_MIN_FILLED = 2;
+
+// Prüft, ob jede Reihe mindestens `minFilled` erledigte Felder hat -
+// unabhängig davon, ob sie Teil eines Pfads sind oder nicht.
+function hasMinFilledPerRow(progress, columns, minFilled) {
+  const totalCells = progress.length;
+  const rows = Math.ceil(totalCells / columns);
+
+  for (let row = 0; row < rows; row++) {
+    let filledInRow = 0;
+    for (let col = 0; col < columns; col++) {
+      const index = row * columns + col;
+      if (index < totalCells && progress[index] !== null) filledInRow++;
+    }
+    if (filledInRow < minFilled) return false;
+  }
+  return true;
+}
+
 const WIN_RULES = {
-  // Aktuell aktiv: "Path Bingo" - durchgehender Pfad von oben nach unten.
-  pathBingo: (progress) => hasVerticalPath(progress, BINGO_COLUMNS),
+  // Aktuell aktiv: wie "Path Bingo", zusätzlich muss jede Reihe mindestens
+  // ROW_MIN_FILLED erledigte Felder haben (nicht nur das eine Feld auf dem
+  // Pfad selbst) - macht "Bingo" etwas anspruchsvoller.
+  pathBingoRowMin: (progress) =>
+    hasVerticalPath(progress, BINGO_COLUMNS) &&
+    hasMinFilledPerRow(progress, BINGO_COLUMNS, ROW_MIN_FILLED),
   // Alternativen, weiterhin verfügbar (einfach oben zuweisen zum Aktivieren):
+  pathBingo: (progress) => hasVerticalPath(progress, BINGO_COLUMNS),
   categoryThreshold: (progress, cells) => {
     const counts = countPerCategory(progress, cells);
     return CATEGORY_ORDER.every((category) => (counts[category] || 0) >= CATEGORY_WIN_THRESHOLD);
@@ -234,7 +260,7 @@ const WIN_RULES = {
 // Zum Ändern der Gewinnregel einfach eine andere Regel aus WIN_RULES
 // zuweisen. Nach Erreichen von "Bingo" kann trotzdem weitergespielt werden -
 // dafür gibt es hier bewusst keine Sperre.
-const ACTIVE_WIN_RULE = WIN_RULES.pathBingo;
+const ACTIVE_WIN_RULE = WIN_RULES.pathBingoRowMin;
 
 // ---------- Kategorie-Farben (nur Optik, keine sichtbaren Kategorie-Namen) ----------
 
