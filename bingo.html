@@ -4,15 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Bingo – Bennet & David 30</title>
-  <link rel="stylesheet" href="css/style.css?v=38">
+  <link rel="stylesheet" href="css/style.css?v=40">
 </head>
 <body>
   <div class="bingo-page">
     <div class="bingo-topbar">
       <a class="back-link" href="index.html">‹ Zurück</a>
       <div class="bingo-topbar__info">
-        <span id="player-name"></span>
+        <button class="player-name-button" id="player-name-button" type="button" aria-label="Namen ändern">
+          <span id="player-name"></span>
+          <span class="player-name-edit-icon" aria-hidden="true">✎</span>
+        </button>
         <span class="bingo-topbar__progress" id="progress-count"></span>
+        <button class="icon-button" id="settings-open-button" type="button" aria-label="Einstellungen">⚙️</button>
       </div>
     </div>
 
@@ -33,6 +37,27 @@
         <li>Deine Karte wird nur auf diesem Handy/in diesem Browser gespeichert – wechsle also nicht den Browser und lösche keine Website-Daten, sonst ist der Fortschritt weg und es entsteht eine neue Karte.</li>
       </ul>
       <button class="overlay__button button-block" id="rules-close-button" type="button">Alles klar</button>
+    </div>
+  </div>
+
+  <!-- Einstellungen: nur noch Karte zurücksetzen -->
+  <div class="overlay" id="settings-overlay">
+    <div class="overlay__sheet">
+      <h2>Einstellungen</h2>
+      <button class="overlay__button overlay__button--ghost button-block" id="settings-reset-button" type="button">Karte zurücksetzen</button>
+      <button class="overlay__button overlay__button--ghost button-block" id="settings-close-button" type="button">Schließen</button>
+    </div>
+  </div>
+
+  <!-- Namen ändern (durch Antippen des Namens oben) -->
+  <div class="overlay" id="name-edit-overlay">
+    <div class="overlay__sheet">
+      <h2>Namen ändern</h2>
+      <input class="overlay__input" id="name-edit-input" type="text" placeholder="Dein Name" autocomplete="name">
+      <div class="overlay__actions">
+        <button class="overlay__button overlay__button--ghost" id="name-edit-cancel" type="button">Abbrechen</button>
+        <button class="overlay__button" id="name-edit-save" type="button">Speichern</button>
+      </div>
     </div>
   </div>
 
@@ -70,8 +95,8 @@
   <!-- Bleibt danach dauerhaft unten sichtbar (auch nach Reload) -->
   <div class="bingo-badge" id="bingo-badge">🎉 Bingo erreicht</div>
 
-  <script src="js/guest.js?v=38"></script>
-  <script src="js/questions.js?v=38"></script>
-  <script src="js/bingo.js?v=38"></script>
+  <script src="js/guest.js?v=40"></script>
+  <script src="js/questions.js?v=40"></script>
+  <script src="js/bingo.js?v=40"></script>
 </body>
 </html>

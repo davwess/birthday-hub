@@ -319,13 +319,34 @@ a {
   color: var(--text-muted);
 }
 
+.player-name-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 150px;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  margin: -4px -2px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 #player-name {
   color: var(--text);
   font-weight: 600;
-  max-width: 140px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.player-name-edit-icon {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  flex-shrink: 0;
 }
 
 .bingo-topbar__progress {
@@ -334,6 +355,18 @@ a {
   padding: 3px 10px;
   border-radius: 999px;
   font-weight: 600;
+  flex-shrink: 0;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 10px 4px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .rules-link {

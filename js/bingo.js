@@ -435,6 +435,58 @@ function showBingoBadge() {
   document.getElementById("bingo-badge").classList.add("bingo-badge--visible");
 }
 
+// ---------- Namen ändern (durch Antippen des Namens in der Kopfzeile) ----------
+
+function openNameEditOverlay() {
+  const input = document.getElementById("name-edit-input");
+  input.value = state.playerName;
+  document.getElementById("name-edit-overlay").classList.add("overlay--visible");
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeNameEditOverlay() {
+  document.getElementById("name-edit-overlay").classList.remove("overlay--visible");
+}
+
+function handleNameEditSave() {
+  const input = document.getElementById("name-edit-input");
+  const name = input.value.trim();
+  if (!name) return;
+
+  state.playerName = name;
+  setGuestName(name); // auch für Songwunsch & künftige Besuche übernehmen
+  saveState(state);
+  renderTopbar();
+  closeNameEditOverlay();
+}
+
+// ---------- Einstellungen (nur noch Karte zurücksetzen) ----------
+
+function openSettingsOverlay() {
+  document.getElementById("settings-overlay").classList.add("overlay--visible");
+}
+
+function closeSettingsOverlay() {
+  document.getElementById("settings-overlay").classList.remove("overlay--visible");
+}
+
+// Erzeugt eine komplett neue Karte (neue zufällige Aufgaben, leerer
+// Fortschritt) - der Name bleibt erhalten. Braucht eine Bestätigung, weil
+// der bisherige Fortschritt dabei unwiderruflich verloren geht.
+function handleSettingsReset() {
+  const confirmed = confirm(
+    "Karte wirklich zurücksetzen? Dein bisheriger Fortschritt geht dabei verloren."
+  );
+  if (!confirmed) return;
+
+  state = createNewState(state.playerName);
+  saveState(state);
+  document.getElementById("bingo-badge").classList.remove("bingo-badge--visible");
+  renderGrid();
+  renderTopbar();
+  closeSettingsOverlay();
+}
+
 // ---------- Start ----------
 
 function init() {
@@ -484,6 +536,14 @@ function init() {
   document.getElementById("rules-close-button").addEventListener("click", () => {
     document.getElementById("rules-overlay").classList.remove("overlay--visible");
   });
+
+  document.getElementById("settings-open-button").addEventListener("click", openSettingsOverlay);
+  document.getElementById("settings-close-button").addEventListener("click", closeSettingsOverlay);
+  document.getElementById("settings-reset-button").addEventListener("click", handleSettingsReset);
+
+  document.getElementById("player-name-button").addEventListener("click", openNameEditOverlay);
+  document.getElementById("name-edit-cancel").addEventListener("click", closeNameEditOverlay);
+  document.getElementById("name-edit-save").addEventListener("click", handleNameEditSave);
 }
 
 document.addEventListener("DOMContentLoaded", init);

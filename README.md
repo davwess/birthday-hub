@@ -132,6 +132,15 @@ birthday-hub/
   `state.bingoAt` gesetzt ist. Die große Einblendung erscheint nur einmal.
 - Jede Aufgabe hat ein `shortLabel` (kurzes Stichwort, auf der Karte sichtbar) und
   einen `text` (volle Aufgabe, erscheint erst beim Antippen).
+- **Namen ändern:** der Name oben in der Kopfzeile ist antippbar (kleines
+  Stift-Symbol als Hinweis) und öffnet ein Overlay zum Umbenennen –
+  aktualisiert `state.playerName` und den gemeinsamen `birthdayHubGuestName`
+  (also auch fürs Songwunsch-Formular).
+- **Einstellungen (Zahnrad-Icon oben rechts):** öffnet ein Overlay mit nur
+  einer Funktion, Karte zurücksetzen – erzeugt eine komplett neue Karte mit
+  leerem Fortschritt, nach Bestätigung per Browser-Dialog, weil der bisherige
+  Fortschritt dabei unwiderruflich verloren geht. Der Name bleibt dabei
+  erhalten.
 - `js/bingo.js` hat oben eine `SCHEMA_VERSION`-Konstante. Falls sich der Aufbau des
   gespeicherten Spielstands mal ändert (neues Feld, andere Aufgabenanzahl o. Ä.),
   diese Zahl um 1 erhöhen – alte, nicht mehr passende Spielstände werden dann
